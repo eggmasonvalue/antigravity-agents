@@ -28,6 +28,17 @@ A lightweight, shell-first software engineering agent.
 - **Tools (11)**: `run_command`, `view_file`, `replace_file_content`, `write_to_file`, `search_web`, `read_url_content`, `invoke_subagent`, `define_subagent`, `send_message`, `manage_subagents`, `manage_task`.
 - **Pruned (5)**: `ask_question`, `list_dir`, `grep_search`, `generate_image`, `schedule`.
 
+### Verified Benchmark (`agy v1.1.13`)
+
+| Agent | Base Input Tokens (Turn 0) | Token Savings |
+| :--- | :--- | :--- |
+| **Default Root Agent** | `14,997` tokens | Baseline |
+| **`better-agy`** | **`9,565` tokens** | **-5,432 tokens (~36.2% reduction)** |
+
+> **Context Inspection**:
+> - **Interactive TUI**: Run the `/context` slash command inside an active session.
+> - **Programmatic / CLI**: Run `agy --agent better-agy --output-format json -p "ping"` to inspect JSON `usage.input_tokens`.
+
 ---
 
 ## Usage

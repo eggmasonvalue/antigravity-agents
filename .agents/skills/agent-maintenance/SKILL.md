@@ -68,7 +68,26 @@ Use this skill when auditing, updating, or maintaining custom agent definitions 
    agy agents
    ```
    Confirm that the updated agent appears in the discovered list.
-3. **Session Test**:
+3. **Session Smoke Test**:
    ```bash
-   agy --agent <agent-name> -p "ping"
+   agy --agent <agent-name> -p "respond with 'pong'"
    ```
+
+---
+
+## 5. Token Benchmarking & Comparison
+
+To measure token overhead and verify schema savings programmatically without manual TUI interaction:
+
+1. **Benchmark Default Agent**:
+   ```bash
+   agy --output-format json -p "respond with 'pong'"
+   ```
+2. **Benchmark Custom Agent**:
+   ```bash
+   agy --agent <agent-name> --output-format json -p "respond with 'pong'"
+   ```
+3. Compare `usage.input_tokens` in both outputs to quantify exact baseline token savings.
+
+*(In interactive CLI sessions, users can also type `/context` to inspect active token usage breakdown in the TUI).*
+
