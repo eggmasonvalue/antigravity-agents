@@ -70,7 +70,7 @@ Use this skill when auditing, updating, or maintaining custom agent definitions 
    Confirm that the updated agent appears in the discovered list.
 3. **Session Smoke Test**:
    ```bash
-   agy --agent <agent-name> -p "respond with 'pong'"
+   agy --agent <agent-name> -p "Output 'PONG' and nothing else"
    ```
 
 ---
@@ -81,11 +81,11 @@ To measure token overhead and verify schema savings programmatically without man
 
 1. **Benchmark Default Agent**:
    ```bash
-   agy --output-format json -p "respond with 'pong'"
+   agy --output-format json -p "Output 'PONG' and nothing else"
    ```
 2. **Benchmark Custom Agent**:
    ```bash
-   agy --agent <agent-name> --output-format json -p "respond with 'pong'"
+   agy --agent <agent-name> --output-format json -p "Output 'PONG' and nothing else"
    ```
 3. Compare `usage.input_tokens` in both outputs to quantify exact baseline token savings.
 

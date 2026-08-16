@@ -32,12 +32,12 @@ A lightweight, shell-first software engineering agent.
 
 | Agent | Base Input Tokens (Turn 0) | Token Savings |
 | :--- | :--- | :--- |
-| **Default Root Agent** | `14,997` tokens | Baseline |
-| **`better-agy`** | **`9,565` tokens** | **-5,432 tokens (~36.2% reduction)** |
+| **Default Root Agent** | `14,999` tokens | Baseline |
+| **`better-agy`** | **`9,572` tokens** | **-5,427 tokens (~36.2% reduction)** |
 
 > **Context Inspection**:
 > - **Interactive TUI**: Run the `/context` slash command inside an active session.
-> - **Programmatic / CLI**: Run `agy --agent better-agy --output-format json -p "ping"` to inspect JSON `usage.input_tokens`.
+> - **Programmatic / CLI**: Run `agy --agent better-agy --output-format json -p "Output 'PONG' and nothing else"` to inspect JSON `usage.input_tokens`.
 
 ---
 
