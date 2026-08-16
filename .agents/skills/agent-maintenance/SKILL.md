@@ -37,7 +37,6 @@ The **active session's context window (the tool declarations block)** is the sol
   - Ensure pruned tools (`list_dir`, `grep_search`, `ask_question`, `generate_image`, `schedule`) remain excluded.
 - **`agents/lean-agy.md` (Ultra-Minimal 6 Tools)**:
   - Verify it strictly includes only the 6 core tools.
-  - Verify `skills: [agy-subagents]` is declared in frontmatter.
 - **Agent Roles**: Ensure both agents have `mainAgent: true` and `subagent: false` to prevent polluting other sessions' turn-0 subagent registries.
 
 ### B. CLI Capability Audit (`agy --help`)

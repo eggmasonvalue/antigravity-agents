@@ -57,7 +57,10 @@ An ultra-lean agent for maximum context runway. Drops all built-in subagent tool
 ## Included Skills
 
 ### `agy-subagents`
-A recipe-backed skill for orchestrating isolated CLI subagents, multi-turn steerable sessions (`--conversation`), background workers, and isolated git worktrees via `run_command`. Automatically installed and bound to `lean-agy`.
+A recipe-backed skill for orchestrating isolated CLI subagents, multi-turn steerable sessions (`--conversation`), background workers, and isolated git worktrees via `run_command`.
+
+> [!NOTE]
+> **Skill Scoping in Antigravity**: Antigravity discovers and registers skills globally (`~/.gemini/config/skills/`) or per-workspace (`.agents/skills/`) across all active agent profiles (including `better-agy` and the default agent), as the platform does not currently support per-agent skill scoping or frontmatter filtering. However, thanks to **progressive disclosure**, only the skill name and short description are injected on Turn 0 (~50 tokens), avoiding the heavy ~2,000+ token tax of native subagent tool schemas.
 
 ### `agent-maintenance`
 An audit and synchronization skill to review and update agent configurations following `agy` CLI version upgrades or tool schema adjustments.

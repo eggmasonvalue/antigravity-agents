@@ -11,8 +11,6 @@ tools:
   - write_to_file
   - search_web
   - read_url_content
-skills:
-  - agy-subagents
 ---
 
 # Principles
