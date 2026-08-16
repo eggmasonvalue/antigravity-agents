@@ -1,11 +1,11 @@
 ---
 name: agent-maintenance
-description: Audit, review, and synchronize custom Antigravity agents following agy version upgrades or tool schema changes.
+description: Audit, review, and synchronize custom Antigravity agents and skills following agy version upgrades or tool schema changes.
 ---
 
-# Antigravity Agent Maintenance & Audit Runbook
+# Antigravity Agent & Skill Maintenance Runbook
 
-Use this skill when auditing, updating, or maintaining custom agent definitions within this repository—especially after upgrading the Antigravity CLI (`agy update`) or encountering tool deprecations/additions.
+Use this skill when auditing, updating, or synchronizing agent definitions and skills in this repository—especially after updating the Antigravity CLI (`agy update`) or encountering tool/flag changes.
 
 ---
 
@@ -16,7 +16,7 @@ Use this skill when auditing, updating, or maintaining custom agent definitions 
    agy --version
    ```
 2. Compare against the documented baseline in `README.md`.
-3. If a version bump has occurred, review release notes via:
+3. If a version bump occurred, review release notes and changes:
    ```bash
    agy changelog
    ```
@@ -24,70 +24,61 @@ Use this skill when auditing, updating, or maintaining custom agent definitions 
 
 ---
 
-## 2. Toolset & Schema Audit
+## 2. Toolset & CLI Capability Audit
 
-1. **Authoritative Source of Tools**:
-   The **active session's context window (the tool declarations block)** is the sole authoritative, ground-truth source for all currently available built-in tools and their exact parameter schemas.
-   > [!IMPORTANT]
-   > Do **not** conduct web searches, parse remote documentation, or attempt to inspect CLI help flags (`agy help`, `agy agent`) to discover tool schemas. The CLI surface does not expose tool JSON schemas; only your runtime context declarations do.
+### A. Tool Schema Audit (Active Context Window)
+The **active session's context window (the tool declarations block)** is the sole authoritative ground truth for all currently available built-in tools and their parameter schemas.
 
-2. **Diff Against Agent Tool Manifests**:
-   Compare the active tool declarations directly against the `tools:` frontmatter lists in `agents/*.md`.
+> [!IMPORTANT]
+> Do **not** conduct web searches or inspect CLI help flags to discover tool schemas; only runtime context declarations expose them.
 
-3. **Evaluation Criteria for Tool Pruning vs Inclusion**:
-   - **Keep**: High-leverage, non-redundant primitives (e.g., core execution, surgical edits, subagent orchestration).
-   - **Prune**: 
-     - Tools fully subsumed by `run_command` (e.g. `list_dir`, `grep_search`).
-     - Heavy interactive or modal tools easily replaced by plain text communication (e.g. `ask_question`).
-     - Specialized media generators irrelevant to coding workflows (e.g. `generate_image`).
+- **`agents/better-agy.md` (Balanced 11 Tools)**:
+  - Verify it includes the 6 core tools (`run_command`, `view_file`, `replace_file_content`, `write_to_file`, `search_web`, `read_url_content`) + 5 subagent orchestration tools (`invoke_subagent`, `define_subagent`, `send_message`, `manage_subagents`, `manage_task`).
+  - Ensure pruned tools (`list_dir`, `grep_search`, `ask_question`, `generate_image`, `schedule`) remain excluded.
+- **`agents/lean-agy.md` (Ultra-Minimal 6 Tools)**:
+  - Verify it strictly includes only the 6 core tools.
+  - Verify `skills: [agy-subagents]` is declared in frontmatter.
+- **Agent Roles**: Ensure both agents have `mainAgent: true` and `subagent: false` to prevent polluting other sessions' turn-0 subagent registries.
 
-4. **Token Overhead Assessment**:
-   Every kept tool injects its parameter schema into the system context. Strive to keep the active tool count minimal to protect the model's working window.
-
----
-
-## 3. Agent Definition Updates
-
-1. Edit target files in `agents/<agent-name>.md`.
-2. Ensure YAML frontmatter maintains:
-   - `name`: Matches filename basename.
-   - `mainAgent: true` (for root session agents) and/or `subagent: true`.
-   - `model: inherit` (default) or explicit tier (`pro`, `flash`).
-   - `tools:` Alphabetized or grouped explicit list.
-3. Keep `# Principles` concise, imperative, and aligned with context conservation.
+### B. CLI Capability Audit (`agy --help`)
+1. Inspect available flags and subcommands:
+   ```bash
+   agy --help
+   ```
+2. Compare against the parameter matrix in `.agents/skills/agy-subagents/SKILL.md`.
+3. Update `SKILL.md` if `agy` introduces new execution flags, output formats, or sandbox options.
 
 ---
 
-## 4. Verification & Testing
+## 3. Local Installation & Verification
 
-1. **Local Test Installation**:
-   - **Linux**: `./scripts/install.sh --local`
+1. **Sync Local Changes**:
+   - **Linux / macOS**: `./scripts/install.sh --local`
    - **Windows**: `.\scripts\install.ps1 -Local`
+
 2. **Verify Agent Discovery**:
    ```bash
    agy agents
    ```
-   Confirm that the updated agent appears in the discovered list.
-3. **Session Smoke Test**:
-   ```bash
-   agy --agent <agent-name> -p "Output 'PONG' and nothing else"
-   ```
+   Confirm `better-agy` and `lean-agy` appear in the discovered agents list.
 
 ---
 
-## 5. Token Benchmarking & Comparison
+## 4. Token Benchmarking & README Sync
 
-To measure token overhead and verify schema savings programmatically without manual TUI interaction:
+Run the non-interactive Turn-0 benchmark to verify exact token overhead:
 
 1. **Benchmark Default Agent**:
    ```bash
    agy --output-format json -p "Output 'PONG' and nothing else"
    ```
-2. **Benchmark Custom Agent**:
+2. **Benchmark `better-agy`**:
    ```bash
-   agy --agent <agent-name> --output-format json -p "Output 'PONG' and nothing else"
+   agy --agent better-agy --output-format json -p "Output 'PONG' and nothing else"
    ```
-3. Compare `usage.input_tokens` in both outputs to quantify exact baseline token savings.
-
-*(In interactive CLI sessions, users can also type `/context` to inspect active token usage breakdown in the TUI).*
-
+3. **Benchmark `lean-agy`**:
+   ```bash
+   agy --agent lean-agy --output-format json -p "Output 'PONG' and nothing else"
+   ```
+4. Compare `usage.input_tokens` across all three outputs.
+5. Update the benchmark table and `agy` version in `README.md` with the new metrics.

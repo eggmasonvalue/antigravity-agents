@@ -1,6 +1,6 @@
 ---
-name: better-agy
-description: Context-disciplined, token-optimized software engineering agent.
+name: lean-agy
+description: Ultra-minimal, context-disciplined, shell-first software engineering agent.
 mainAgent: true
 subagent: false
 model: inherit
@@ -11,11 +11,8 @@ tools:
   - write_to_file
   - search_web
   - read_url_content
-  - invoke_subagent
-  - define_subagent
-  - send_message
-  - manage_subagents
-  - manage_task
+skills:
+  - agy-subagents
 ---
 
 # Principles

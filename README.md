@@ -1,26 +1,26 @@
 # Antigravity Agents
 
-> **Eliminate ~36% of Antigravity's hidden turn-zero context tax with near-zero loss in functionality.**
+> **Eliminate up to ~51% of Antigravity's hidden turn-zero context tax with near-zero loss in functionality.**
 
 Every time you launch a default Google Antigravity session, the platform silently injects **~15,000 input tokens** of verbose tool descriptor schemas, prescriptive web-styling rules, and unused feature manifests before you even write your first prompt.
 
-`better-agy` strips **5,400+ tokens of schema bloat on Turn 0 alone** by pruning redundant tools down to a high-signal, shell-first toolkit. You lose virtually zero real-world capability: filesystem searches and directory listings are handled more powerfully via the shell (`rg`, `fd`, `dir`), questions are asked directly in chat, and non-coding media generators are eliminated. Meanwhile, surgical code edits, atomic file writes, live web retrieval, rich interactive artifacts, and full subagent orchestration remain 100% intact.
-
-Combined with strict context-discipline principles, these token savings compound across every turn of your workflow—delivering faster model responses, lower token consumption, and significantly longer conversation runway while retaining all native Google Antigravity OAuth subscription benefits.
+This repository provides two high-performance, context-disciplined custom agents tailored for maximum token runway while retaining all native Google Antigravity OAuth subscription benefits.
 
 ---
 
 ### Turn-0 Benchmark (`agy v1.1.13`)
 
 ```bash
-# Verify it yourself programmatically:
+# Verify programmatically on your own machine:
 agy --agent better-agy --output-format json -p "Output 'PONG' and nothing else"
+agy --agent lean-agy   --output-format json -p "Output 'PONG' and nothing else"
 ```
 
-| Agent Configuration | Turn-0 Base Tokens | Overhead Reduction | Real-World Capability Loss |
-| :--- | :--- | :--- | :--- |
-| **Default Antigravity Agent** | `14,999` tokens | Baseline | — |
-| **`better-agy`** | **`9,572` tokens** | **-5,427 tokens (~36.2% cut)** | **Zero (subsumed by shell/chat)** |
+| Agent Configuration | Turn-0 Base Tokens | Context Tax Reduction | Architecture & Trade-Off |
+| :--- | :---: | :---: | :--- |
+| **Default Antigravity Agent** | `14,999` tokens | Baseline | 16 built-in tools with full schema overhead |
+| **`better-agy`** | **`9,572` tokens** | **-5,427 tokens (~36.2% cut)** | 11 tools; retains native IDE subagent orchestration tools & UI panels |
+| **`lean-agy`** | **`7,301` tokens** | **-7,698 tokens (~51.3% cut)** | 6 core tools; subagent delegation offloaded to on-demand `agy-subagents` skill |
 
 *(Run the `/context` slash command inside any interactive session to inspect your live breakdown).*
 
@@ -42,14 +42,25 @@ irm https://raw.githubusercontent.com/eggmasonvalue/antigravity-agents/main/scri
 
 ## Included Agents
 
-### `better-agy`
-A lightweight, shell-first software engineering agent.
-- **Mechanism**: Strips heavy, unused tool descriptor schemas from the context window (16 default tools pruned down to 11 essential tools) and enforces strict output bounding.
-- **Tools Kept (11)**: `run_command`, `view_file`, `replace_file_content`, `write_to_file`, `search_web`, `read_url_content`, `invoke_subagent`, `define_subagent`, `send_message`, `manage_subagents`, `manage_task`.
-- **Tools Pruned (5)**:
-  - `list_dir`, `grep_search` $\rightarrow$ natively subsumed by `run_command` (`Get-ChildItem`, `rg`, `fd`, `dir`).
-  - `ask_question` $\rightarrow$ replaced by natural chat and interactive artifact reviews.
-  - `generate_image`, `schedule` $\rightarrow$ non-essential coding overhead removed.
+### 1. `better-agy` (Balanced + UI Subagents)
+A lightweight software engineering agent for users who want token savings while keeping native subagent tools and IDE side-panel integration.
+* **Tools Kept (11)**: `run_command`, `view_file`, `replace_file_content`, `write_to_file`, `search_web`, `read_url_content`, `invoke_subagent`, `define_subagent`, `send_message`, `manage_subagents`, `manage_task`.
+* **Pruned (5)**: `list_dir`, `grep_search` (subsumed by shell), `ask_question` (plain chat/artifacts), `generate_image`, `schedule`.
+
+### 2. `lean-agy` (Ultra-Minimal Shell-First + Skill-Driven Subagents)
+An ultra-lean agent for maximum context runway. Drops all built-in subagent tool schemas from the system prompt on Turn 0. When delegation or parallelization is needed, it dynamically leverages the `agy-subagents` skill via `run_command`.
+* **Tools Kept (6)**: `run_command`, `view_file`, `replace_file_content`, `write_to_file`, `search_web`, `read_url_content`.
+* **Pruned (10)**: All subagent orchestration schemas and non-essential tools.
+
+---
+
+## Included Skills
+
+### `agy-subagents`
+A recipe-backed skill for orchestrating isolated CLI subagents, multi-turn steerable sessions (`--conversation`), background workers, and isolated git worktrees via `run_command`. Automatically installed and bound to `lean-agy`.
+
+### `agent-maintenance`
+An audit and synchronization skill to review and update agent configurations following `agy` CLI version upgrades or tool schema adjustments.
 
 ---
 
@@ -57,16 +68,18 @@ A lightweight, shell-first software engineering agent.
 
 Launch directly as your primary session agent:
 ```bash
+# Launch balanced agent
 agy --agent better-agy
+
+# Launch ultra-minimal agent
+agy --agent lean-agy
 ```
-Or select it via the interactive `/agents` panel inside the CLI.
+Or select either agent via the interactive `/agents` panel inside the CLI.
 
 ---
 
-## Local Development & Maintenance
+## Local Development & Testing
 
 To test or install from a local checkout:
 - **Linux**: `./scripts/install.sh --local`
 - **Windows**: `.\scripts\install.ps1 -Local`
-
-To audit and update agents following `agy` version bumps, reference the workspace skill at `.agents/skills/agent-maintenance/SKILL.md`.
