@@ -34,7 +34,7 @@ The **active session's context window (the tool declarations block)** is the sol
 
 - **`agents/better-agy.md` (Balanced 11 Tools)**:
   - Verify it includes the 6 core tools (`run_command`, `view_file`, `replace_file_content`, `write_to_file`, `search_web`, `read_url_content`) + 5 subagent orchestration tools (`invoke_subagent`, `define_subagent`, `send_message`, `manage_subagents`, `manage_task`).
-  - Ensure pruned tools (`list_dir`, `grep_search`, `ask_question`, `generate_image`, `schedule`) remain excluded.
+  - Ensure pruned tools (`list_dir`, `grep_search`, `find_by_name`, `ask_question`, `generate_image`, `schedule`) remain excluded.
 - **`agents/lean-agy.md` (Ultra-Minimal 6 Tools)**:
   - Verify it strictly includes only the 6 core tools.
 - **Agent Roles**: Ensure both agents have `mainAgent: true` and `subagent: false` to prevent polluting other sessions' turn-0 subagent registries.
