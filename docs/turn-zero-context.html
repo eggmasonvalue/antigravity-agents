@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Antigravity CLI v1.2.2 — Turn-0 Context & Agent Subsets</title>
+  <style>
+    :root {
+      --bg: #0b0d13;
+      --card-bg: #131722;
+      --card-border: #232936;
+      --text: #e2e8f0;
+      --text-muted: #8892b0;
+      --code-bg: #080a0f;
+      --core-color: #10b981;
+      --core-bg: rgba(16, 185, 129, 0.12);
+      --core-border: #10b981;
+      --subagent-color: #3b82f6;
+      --subagent-bg: rgba(59, 130, 246, 0.12);
+      --subagent-border: #3b82f6;
+      --pruned-color: #94a3b8;
+      --pruned-bg: rgba(148, 163, 184, 0.08);
+      --pruned-border: #334155;
+      --dimmed-opacity: 0.22;
+      --highlight-glow: 0 0 15px rgba(16, 185, 129, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding-bottom: 80px;
+    }
+
+    /* Sticky Control Header */
+    header.sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(11, 13, 19, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 16px 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .header-title h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+
+    .header-title p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .controls-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Segmented Button Group */
+    .segmented-control {
+      display: inline-flex;
+      background: #171b26;
+      border: 1px solid var(--card-border);
+      border-radius: 9999px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .segmented-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 18px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .segmented-btn:hover {
+      color: #fff;
+    }
+
+    .segmented-btn.active[data-mode="all"] {
+      background: #2a3348;
+      color: #fff;
+    }
+
+    .segmented-btn.active[data-mode="better"] {
+      background: var(--subagent-color);
+      color: #fff;
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+    }
+
+    .segmented-btn.active[data-mode="lean"] {
+      background: var(--core-color);
+      color: #0b0d13;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+    }
+
+    /* Stats Ribbon */
+    .stats-ribbon {
+      max-width: 1200px;
+      margin: 24px auto 0 auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: border-color 0.2s ease;
+    }
+
+    .stat-card.active-card {
+      border-color: #fff;
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .stat-val {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #fff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .stat-sub {
+      font-size: 0.82rem;
+      font-weight: 500;
+    }
+
+    .sub-default { color: #cbd5e1; }
+    .sub-better { color: #60a5fa; }
+    .sub-lean { color: #34d399; }
+
+    /* Legend Bar */
+    .legend-bar {
+      max-width: 1200px;
+      margin: 20px auto 0 auto;
+      padding: 0 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      align-items: center;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .dot-core { background: var(--core-color); box-shadow: 0 0 6px var(--core-color); }
+    .dot-subagent { background: var(--subagent-color); box-shadow: 0 0 6px var(--subagent-color); }
+    .dot-pruned { background: var(--pruned-color); }
+
+    /* Main Container */
+    main.container {
+      max-width: 1200px;
+      margin: 32px auto 0 auto;
+      padding: 0 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .section-header {
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .section-header h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+
+    .section-header span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Prompt Cards */
+    .prompt-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: opacity 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .prompt-card.dimmed {
+      opacity: var(--dimmed-opacity);
+    }
+
+    .prompt-card.dimmed:hover {
+      opacity: 0.85;
+      transform: translateY(-1px);
+    }
+
+    .prompt-card.active-overlay-core {
+      border-color: var(--core-border);
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.15);
+    }
+
+    .prompt-card.active-overlay-subagent {
+      border-color: var(--subagent-border);
+      box-shadow: 0 0 14px rgba(59, 130, 246, 0.15);
+    }
+
+    .card-head {
+      padding: 14px 20px;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: #fff;
+    }
+
+    /* Badges */
+    .badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-core {
+      background: var(--core-bg);
+      color: var(--core-color);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-subagent {
+      background: var(--subagent-bg);
+      color: var(--subagent-color);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .badge-pruned {
+      background: var(--pruned-bg);
+      color: var(--pruned-color);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .status-badge {
+      font-size: 0.74rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .status-badge.active-status {
+      display: inline-block;
+    }
+
+    .status-retained-lean {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+    }
+
+    .status-retained-better {
+      background: rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+    }
+
+    .status-pruned {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+    }
+
+    .card-body {
+      padding: 16px 20px;
+    }
+
+    .card-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .card-rationale {
+      font-size: 0.82rem;
+      background: #0f121a;
+      border-left: 3px solid var(--card-border);
+      padding: 8px 12px;
+      margin-bottom: 14px;
+      border-radius: 0 6px 6px 0;
+      color: #94a3b8;
+    }
+
+    .card-rationale strong {
+      color: #e2e8f0;
+    }
+
+    pre.code-block {
+      background: var(--code-bg);
+      border: 1px solid #1a202c;
+      border-radius: 8px;
+      padding: 14px;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+      max-height: 320px;
+    }
+
+    .grid-tools {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 16px;
+    }
+
+    .tool-card {
+      margin-bottom: 0;
+    }
+
+    /* Collapsible Schema */
+    details summary {
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      user-select: none;
+      margin-top: 8px;
+    }
+
+    details summary:hover {
+      color: #fff;
+    }
+
+    details[open] summary {
+      margin-bottom: 8px;
+    }
+
+    /* Footer */
+    footer {
+      max-width: 1200px;
+      margin: 60px auto 0 auto;
+      padding: 24px;
+      border-top: 1px solid var(--card-border);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    footer a {
+      color: var(--core-color);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Header Controls -->
+  <header class="sticky-header">
+    <div class="header-container">
+      <div class="header-title">
+        <h1>Antigravity Turn-0 Context & Agent Subsets</h1>
+        <p>Verified against <code>agy v1.2.2</code> &mdash; Interactive Color-Coded Overlay</p>
+      </div>
+
+      <div class="controls-wrapper">
+        <div class="segmented-control" role="tablist">
+          <button class="segmented-btn active" data-mode="all" onclick="setOverlay('all')">
+            ● Show All (Default)
+          </button>
+          <button class="segmented-btn" data-mode="better" onclick="setOverlay('better')">
+            Overlay better-agy
+          </button>
+          <button class="segmented-btn" data-mode="lean" onclick="setOverlay('lean')">
+            Overlay lean-agy
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Summary Stats Ribbon -->
+  <section class="stats-ribbon">
+    <div class="stat-card" id="card-stat-default">
+      <span class="stat-label">Default Agent Baseline</span>
+      <span class="stat-val">13,728</span>
+      <span class="stat-sub sub-default">17 Tools + All Default Boilerplate</span>
+    </div>
+    <div class="stat-card" id="card-stat-better">
+      <span class="stat-label">better-agy Subset</span>
+      <span class="stat-val">6,196</span>
+      <span class="stat-sub sub-better">-7,532 tokens (-54.9% cut)</span>
+    </div>
+    <div class="stat-card" id="card-stat-lean">
+      <span class="stat-label">lean-agy Subset</span>
+      <span class="stat-val">4,078</span>
+      <span class="stat-sub sub-lean">-9,650 tokens (-70.3% cut)</span>
+    </div>
+  </section>
+
+  <!-- Legend Bar -->
+  <section class="legend-bar">
+    <span style="font-weight: 600; color: #fff;">Tiers:</span>
+    <div class="legend-item">
+      <span class="legend-dot dot-core"></span>
+      <span><strong>Core Tier</strong> (Retained in <code>lean-agy</code>, <code>better-agy</code>, Default)</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot dot-subagent"></span>
+      <span><strong>Subagent Tier</strong> (Retained in <code>better-agy</code> & Default; skill-driven in <code>lean-agy</code>)</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot dot-pruned"></span>
+      <span><strong>Default Only</strong> (Pruned via <code>excludeDefaultComponents: true</code> & tool limits)</span>
+    </div>
+  </section>
+
+  <!-- Main Turn-0 Context Walkthrough -->
+  <main class="container">
+
+    <!-- Group 1: Core Base Metadata -->
+    <section>
+      <div class="section-header">
+        <h2>1. Platform Identity & Workspace Metadata</h2>
+        <span>Core Context Injected on Turn 0</span>
+      </div>
+
+      <div class="prompt-card tier-core" data-tiers="core,better,lean">
+        <div class="card-head">
+          <div class="card-title-group">
+            <span class="card-title">&lt;identity&gt; &amp; &lt;user_information&gt;</span>
+            <span class="badge badge-core">Core</span>
+            <span class="status-badge" id="status-meta"></span>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Specifies the platform identity, active workspace URI mappings, app data directory, OS version, and conversation ID.</p>
+          <pre class="code-block">&lt;identity&gt;
+You are Antigravity, a powerful agentic AI coding assistant designed by the Google Deepmind team...
+&lt;/identity&gt;
+&lt;user_information&gt;
+The USER's OS version is linux.
+The user has 1 active workspaces, each defined by a URI and a CorpusName...
+App Data Directory: /home/.../.gemini/antigravity-cli
+Conversation ID: ce9bb6c6-9922-40e1-93cb-fb64b3bf3d35
+&lt;/user_information&gt;</pre>
+        </div>
+      </div>
+
+      <div class="prompt-card tier-custom" data-tiers="core,better,lean">
+        <div class="card-head">
+          <div class="card-title-group">
+            <span class="card-title">Agent Principles (Markdown Body)</span>
+            <span class="badge badge-core">Custom</span>
+            <span class="status-badge" id="status-principles"></span>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Direct instructions replacing hundreds of lines of default conversational boilerplate.</p>
+          <pre class="code-block"># Principles
+- **Context Discipline**: Context window capacity is finite and irreversible. All commands, queries,
+  listings, searches, and file reads must be strictly bounded in output before execution. Never emit
+  unmetered or streaming output directly into context.
+- **Direct Communication**: Deliver concise, precise, and direct responses without conversational filler,
+  boilerplate pleasantries, or unprompted recaps of modified files.</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Group 2: Core Tools (6) -->
+    <section>
+      <div class="section-header">
+        <h2>2. Core Engineering Tools (6 Tools)</h2>
+        <span>Retained across ALL agents (&lt;2,200 tokens total)</span>
+      </div>
+
+      <div class="grid-tools">
+        <!-- run_command -->
+        <div class="prompt-card tool-card tier-core" data-tiers="core,better,lean">
+          <div class="card-head">
+            <div class="card-title-group">
+              <span class="card-title">run_command</span>
+              <span class="badge badge-core">Core</span>
+              <span class="status-badge"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-desc">Direct bash/shell command execution. Subsumes file searches and directory listings with <code>ls</code>, <code>grep</code>, <code>rg</code>, and <code>find</code>.</p>
+            <details>
+              <summary>View Tool Schema Snippet</summary>
+              <pre class="code-block">parameters: {
+  CommandLine: { type: "STRING", description: "The exact command line string to execute." },
+  Cwd: { type: "STRING", description: "Working directory for the command" },
+  WaitMsBeforeAsync: { type: "INTEGER" }
+}</pre>
+            </details>
+          </div>
+        </div>
+
+        <!-- view_file -->
+        <div class="prompt-card tool-card tier-core" data-tiers="core,better,lean">
+          <div class="card-head">
+            <div class="card-title-group">
+              <span class="card-title">view_file</span>
+              <span class="badge badge-core">Core</span>
+              <span class="status-badge"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-desc">Defensive file reading with slice notation (StartLine/EndLine) to strictly meter context window consumption.</p>
+            <details>
+              <summary>View Tool Schema Snippet</summary>
+              <pre class="code-block">parameters: {
+  AbsolutePath: { type: "STRING" },
+  StartLine: { type: "INTEGER" },
+  EndLine: { type: "INTEGER" }
+}</pre>
+            </details>
+          </div>
+        </div>
+
+        <!-- replace_file_content -->
+        <div class="prompt-card tool-card tier-core" data-tiers="core,better,lean">
+          <div class="card-head">
+            <div class="card-title-group">
+              <span class="card-title">replace_file_content</span>
+              <span class="badge badge-core">Core</span>
+              <span class="status-badge"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-desc">Surgical contiguous string edits without rewriting untouched files.</p>
+            <details>
+              <summary>View Tool Schema Snippet</summary>
+              <pre class="code-block">parameters: {
+  TargetFile: { type: "STRING" },
+  TargetContent: { type: "STRING" },
+  ReplacementContent: { type: "STRING" },
+  StartLine: { type: "INTEGER" },
+  EndLine: { type: "INTEGER" }
+}</pre>
+            </details>
+          </div>
+        </div>
+
+        <!-- write_to_file -->
+        <div class="prompt-card tool-card tier-core" data-tiers="core,better,lean">
+          <div class="card-head">
+            <div class="card-title-group">
+              <span class="card-title">write_to_file</span>
+              <span class="badge badge-core">Core</span>
+              <span class="status-badge"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-desc">Creates new files or overwrites existing files.</p>
+            <details>
+              <summary>View Tool Schema Snippet</summary>
+              <pre class="code-block">parameters: {
+  TargetFile: { type: "STRING" },
+  CodeContent: { type: "STRING" },
+  Overwrite: { type: "BOOLEAN" }
+}</pre>
+            </details>
+          </div>
+        </div>
+
+        <!-- search_web -->
+        <div class="prompt-card tool-card tier-core" data-tiers="core,better,lean">
+          <div class="card-head">
+            <div class="card-title-group">
+              <span class="card-title">search_web</span>
+              <span class="badge badge-core">Core</span>
+              <span class="status-badge"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-desc">Queries Google Search for live external documentation, APIs, and error fixes.</p>
+            <details>
+              <summary>View Tool Schema Snippet</summary>
+              <pre class="code-block">parameters: {
+  query: { type: "STRING" },
+  domain: { type: "STRING" }
+}</pre>
+            </details>
+          </div>
+        </div>
+
+        <!-- read_url_content -->
+        <div class="prompt-card tool-card tier-core" data-tiers="core,better,lean">
+          <div class="card-head">
+            <div class="card-title-group">
+              <span class="card-title">read_url_content</span>
+              <span class="badge badge-core">Core</span>
+              <span class="status-badge"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-desc">Fetches static public web pages and converts HTML to markdown.</p>
+            <details>
+              <summary>View Tool Schema Snippet</summary>
+              <pre class="code-block">parameters: {
+  Url: { type: "STRING" }
+}</pre>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Group 3: Subagent Tools (5) -->
+    <section>
+      <div class="section-header">
+        <h2>3. Native Subagent Orchestration Tools (5 Tools)</h2>
+        <span>Retained in <code>better-agy</code> (~2,120 tokens) &bull; Skill-delegated in <code>lean-agy</code></span>
+      </div>
+
+      <div class="grid-tools">
+        <div class="prompt-card tool-card tier-subagent" data-tiers="subagent,better">
+          <div class="card-head">
+            <div class="card-title-group">
+              <span class="card-title">invoke_subagent</span>
+              <span class="badge badge-subagent">Subagent</span>
+              <span class="status-badge"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-desc">Spawns background subagents by role and prompt.</p>
+            <div class="card-rationale">
+              <strong>Subagent Strategy:</strong> In <code>lean-agy</code>, this heavy schema is dropped on Turn 0 and delegated to the on-demand <code>agy-subagents</code> skill via <code>run_command</code>.
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card tool-card tier-subagent" data-tiers="subagent,better">
+          <div class="card-head">
+            <div class="card-title-group">
+              <span class="card-title">define_subagent</span>
+              <span class="badge badge-subagent">Subagent</span>
+              <span class="status-badge"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-desc">Defines transient custom subagents in runtime memory.</p>
+          </div>
+        </div>
+
+        <div class="prompt-card tool-card tier-subagent" data-tiers="subagent,better">
+          <div class="card-head">
+            <div class="card-title-group">
+              <span class="card-title">send_message</span>
+              <span class="badge badge-subagent">Subagent</span>
+              <span class="status-badge"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-desc">Sends messages to running or idle subagents by conversation ID.</p>
+          </div>
+        </div>
+
+        <div class="prompt-card tool-card tier-subagent" data-tiers="subagent,better">
+          <div class="card-head">
+            <div class="card-title-group">
+              <span class="card-title">manage_subagents</span>
+              <span class="badge badge-subagent">Subagent</span>
+              <span class="status-badge"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-desc">Lists live subagents and terminates active threads.</p>
+          </div>
+        </div>
+
+        <div class="prompt-card tool-card tier-subagent" data-tiers="subagent,better">
+          <div class="card-head">
+            <div class="card-title-group">
+              <span class="card-title">manage_task</span>
+              <span class="badge badge-subagent">Subagent</span>
+              <span class="status-badge"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-desc">Controls background terminal jobs (kill, status, send_input).</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Group 4: Pruned Tools (6) -->
+    <section>
+      <div class="section-header">
+        <h2>4. Redundant Built-in Tools (6 Tools)</h2>
+        <span>Pruned in both custom agents (~3,980 tokens saved)</span>
+      </div>
+
+      <div class="grid-tools">
+        <div class="prompt-card tool-card tier-pruned" data-tiers="default">
+          <div class="card-head">
+            <div class="card-title-group">
+              <span class="card-title">list_dir</span>
+              <span class="badge badge-pruned">Default Only</span>
+              <span class="status-badge"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-desc">Recursive directory listing tool.</p>
+            <div class="card-rationale">
+              <strong>Subsumed by Shell:</strong> <code>run_command</code> running <code>ls -la</code> or <code>tree -L 2</code> is faster, formatted, and strictly bounded.
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card tool-card tier-pruned" data-tiers="default">
+          <div class="card-head">
+            <div class="card-title-group">
+              <span class="card-title">grep_search</span>
+              <span class="badge badge-pruned">Default Only</span>
+              <span class="status-badge"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-desc">Ripgrep regex search over files.</p>
+            <div class="card-rationale">
+              <strong>Subsumed by Shell:</strong> <code>run_command</code> running <code>rg -n "pattern"</code> gives identical results without injecting a 50-line JSON schema.
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card tool-card tier-pruned" data-tiers="default">
+          <div class="card-head">
+            <div class="card-title-group">
+              <span class="card-title">find_by_name</span>
+              <span class="badge badge-pruned">Default Only</span>
+              <span class="status-badge"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-desc">Filename search using fd.</p>
+            <div class="card-rationale">
+              <strong>Subsumed by Shell:</strong> <code>find . -name "pattern"</code> or <code>fd</code> via shell handles file search with zero token tax.
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card tool-card tier-pruned" data-tiers="default">
+          <div class="card-head">
+            <div class="card-title-group">
+              <span class="card-title">ask_question</span>
+              <span class="badge badge-pruned">Default Only</span>
+              <span class="status-badge"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-desc">Renders interactive multi-choice question modals.</p>
+            <div class="card-rationale">
+              <strong>Natural Chat:</strong> Models ask questions directly in conversation text; a complex modal schema is unnecessary.
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card tool-card tier-pruned" data-tiers="default">
+          <div class="card-head">
+            <div class="card-title-group">
+              <span class="card-title">generate_image</span>
+              <span class="badge badge-pruned">Default Only</span>
+              <span class="status-badge"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-desc">Image generation via Imagen/text prompts.</p>
+            <div class="card-rationale">
+              <strong>Niche Tool:</strong> Non-essential for software engineering and coding workflows.
+            </div>
+          </div>
+        </div>
+
+        <div class="prompt-card tool-card tier-pruned" data-tiers="default">
+          <div class="card-head">
+            <div class="card-title-group">
+              <span class="card-title">schedule</span>
+              <span class="badge badge-pruned">Default Only</span>
+              <span class="status-badge"></span>
+            </div>
+          </div>
+          <div class="card-body">
+            <p class="card-desc">Sets one-shot timers or cron jobs.</p>
+            <div class="card-rationale">
+              <strong>Niche Tool:</strong> Timers are handled via CLI client scheduling or standard shell timers.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Group 5: Default System Prompt Sections -->
+    <section>
+      <div class="section-header">
+        <h2>5. Default System Prompt Sections</h2>
+        <span>Opted out via <code>excludeDefaultComponents: true</code> (~3,000 tokens saved)</span>
+      </div>
+
+      <div class="prompt-card tier-pruned" data-tiers="default">
+        <div class="card-head">
+          <div class="card-title-group">
+            <span class="card-title">&lt;artifacts&gt; (~1,250 tokens)</span>
+            <span class="badge badge-pruned">Default Only</span>
+            <span class="status-badge"></span>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Extensive instructions on markdown artifacts, alert callouts (<code>[!NOTE]</code>, <code>[!WARNING]</code>), Mermaid diagrams, and scratch scripts.</p>
+          <div class="card-rationale">
+            <strong>Anxiety Reassurance:</strong> The Antigravity IDE and CLI render markdown artifacts and Mermaid flowcharts automatically on the client. Removing 1,250 tokens of styling boilerplate does NOT stop artifacts from working.
+          </div>
+        </div>
+      </div>
+
+      <div class="prompt-card tier-pruned" data-tiers="default">
+        <div class="card-head">
+          <div class="card-title-group">
+            <span class="card-title">&lt;slash_commands&gt; (~420 tokens)</span>
+            <span class="badge badge-pruned">Default Only</span>
+            <span class="status-badge"></span>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Prescriptive list instructing the model to suggest <code>/goal</code>, <code>/plan</code>, <code>/boost</code>, <code>/schedule</code>, and <code>/teamwork-preview</code>.</p>
+          <div class="card-rationale">
+            <strong>Client-Side Shortcuts:</strong> Slash commands are intercepted directly by the CLI client. The LLM does not need a static dictionary of commands to function.
+          </div>
+        </div>
+      </div>
+
+      <div class="prompt-card tier-pruned" data-tiers="default">
+        <div class="card-head">
+          <div class="card-title-group">
+            <span class="card-title">&lt;conversation_transcript&gt; (~360 tokens)</span>
+            <span class="badge badge-pruned">Default Only</span>
+            <span class="status-badge"></span>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Technical specification of JSONL trajectory logs, step types (<code>PLANNER_RESPONSE</code>, <code>USER_INPUT</code>), and truncation flags.</p>
+          <div class="card-rationale">
+            <strong>Internal Daemon Task:</strong> Trajectory logging is written by the Antigravity language server process; models do not format or create these files.
+          </div>
+        </div>
+      </div>
+
+      <div class="prompt-card tier-pruned" data-tiers="default">
+        <div class="card-head">
+          <div class="card-title-group">
+            <span class="card-title">&lt;messaging&gt; &amp; &lt;subagents&gt; Boilerplate (~540 tokens)</span>
+            <span class="badge badge-pruned">Default Only</span>
+            <span class="status-badge"></span>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Generic explanations of asynchronous message queues, reactive wakeups, and subagent descriptions.</p>
+          <div class="card-rationale">
+            <strong>Preserved Hooks:</strong> Post-invocation hooks and event loops are maintained in the host daemon; omitting prompt boilerplate changes nothing about runtime wakeups.
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Antigravity Agents &bull; Context Discipline for High-Velocity Software Engineering &bull; <a href="../README.md">Return to README</a></p>
+  </footer>
+
+  <script>
+    function setOverlay(mode) {
+      // Update segmented buttons
+      document.querySelectorAll('.segmented-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
+      });
+
+      // Update stat cards
+      document.querySelectorAll('.stat-card').forEach(card => card.classList.remove('active-card'));
+      if (mode === 'all') document.getElementById('card-stat-default').classList.add('active-card');
+      if (mode === 'better') document.getElementById('card-stat-better').classList.add('active-card');
+      if (mode === 'lean') document.getElementById('card-stat-lean').classList.add('active-card');
+
+      // Update prompt cards
+      document.querySelectorAll('.prompt-card').forEach(card => {
+        const tiers = card.getAttribute('data-tiers').split(',');
+        const statusBadge = card.querySelector('.status-badge');
+        
+        card.classList.remove('dimmed', 'active-overlay-core', 'active-overlay-subagent');
+        if (statusBadge) {
+          statusBadge.className = 'status-badge';
+          statusBadge.textContent = '';
+        }
+
+        if (mode === 'all') {
+          // Normal contrast for all
+        } else if (mode === 'better') {
+          if (tiers.includes('better')) {
+            if (tiers.includes('core')) {
+              card.classList.add('active-overlay-core');
+              if (statusBadge) {
+                statusBadge.classList.add('active-status', 'status-retained-lean');
+                statusBadge.textContent = 'Active in better-agy';
+              }
+            } else {
+              card.classList.add('active-overlay-subagent');
+              if (statusBadge) {
+                statusBadge.classList.add('active-status', 'status-retained-better');
+                statusBadge.textContent = 'Active in better-agy';
+              }
+            }
+          } else {
+            card.classList.add('dimmed');
+            if (statusBadge) {
+              statusBadge.classList.add('active-status', 'status-pruned');
+              statusBadge.textContent = 'Pruned in better-agy';
+            }
+          }
+        } else if (mode === 'lean') {
+          if (tiers.includes('lean')) {
+            card.classList.add('active-overlay-core');
+            if (statusBadge) {
+              statusBadge.classList.add('active-status', 'status-retained-lean');
+              statusBadge.textContent = 'Active in lean-agy';
+            }
+          } else {
+            card.classList.add('dimmed');
+            if (statusBadge) {
+              statusBadge.classList.add('active-status', 'status-pruned');
+              statusBadge.textContent = 'Pruned in lean-agy';
+            }
+          }
+        }
+      });
+    }
+
+    // Default initialization
+    setOverlay('all');
+  </script>
+</body>
+</html>

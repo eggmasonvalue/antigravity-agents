@@ -34,9 +34,11 @@ The **active session's context window (the tool declarations block)** is the sol
 
 - **`agents/better-agy.md` (Balanced 11 Tools)**:
   - Verify it includes the 6 core tools (`run_command`, `view_file`, `replace_file_content`, `write_to_file`, `search_web`, `read_url_content`) + 5 subagent orchestration tools (`invoke_subagent`, `define_subagent`, `send_message`, `manage_subagents`, `manage_task`).
-  - Ensure pruned tools (`list_dir`, `grep_search`, `ask_question`, `generate_image`, `schedule`) remain excluded.
+  - Ensure pruned tools (`list_dir`, `grep_search`, `find_by_name`, `ask_question`, `generate_image`, `schedule`) remain excluded.
+  - Verify `excludeDefaultComponents: true` is set in frontmatter.
 - **`agents/lean-agy.md` (Ultra-Minimal 6 Tools)**:
   - Verify it strictly includes only the 6 core tools.
+  - Verify `excludeDefaultComponents: true` is set in frontmatter.
 - **Agent Roles**: Ensure both agents have `mainAgent: true` and `subagent: false` to prevent polluting other sessions' turn-0 subagent registries.
 
 ### B. CLI Capability Audit (`agy --help`)
@@ -63,7 +65,7 @@ The **active session's context window (the tool declarations block)** is the sol
 
 ---
 
-## 4. Token Benchmarking & README Sync
+## 4. Token Benchmarking
 
 Run the non-interactive Turn-0 benchmark to verify exact token overhead:
 
@@ -80,4 +82,24 @@ Run the non-interactive Turn-0 benchmark to verify exact token overhead:
    agy --agent lean-agy --output-format json -p "Output 'PONG' and nothing else"
    ```
 4. Compare `usage.input_tokens` across all three outputs.
-5. Update the benchmark table and `agy` version in `README.md` with the new metrics.
+
+---
+
+## 5. Documentation & Turn-0 Context Sync
+
+Whenever tool schemas, prompt components, or baseline versions change:
+
+1. **Update `docs/turn-zero-context.md`**:
+   - Update the baseline `agy` version and Turn-0 token metrics in the summary table.
+   - Update the Component & Tool Subset Matrix if upstream added or modified built-in tools.
+   - Confirm rationale notes address user anxiety regarding any newly pruned items.
+
+2. **Update `docs/turn-zero-context.html`**:
+   - Update the title and header to the new `agy` version tag.
+   - Update the stat card token figures (`Default`, `better-agy`, `lean-agy`).
+   - If new tools or prompt sections were introduced, add them with appropriate `tier-*` classes (`tier-core`, `tier-subagent`, or `tier-pruned`) and `data-tiers` attributes.
+
+3. **Update `README.md`**:
+   - Update the Turn-0 Benchmark table metrics and baseline CLI version.
+   - Update the headline context reduction percentage (e.g. `~70%`).
+   - Confirm relative links to `docs/turn-zero-context.md` and `docs/turn-zero-context.html` remain intact.

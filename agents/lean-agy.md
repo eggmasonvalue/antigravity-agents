@@ -4,6 +4,7 @@ description: Ultra-minimal, context-disciplined, shell-first software engineerin
 mainAgent: true
 subagent: false
 model: inherit
+excludeDefaultComponents: true
 tools:
   - run_command
   - view_file
