@@ -93,13 +93,12 @@ Whenever tool schemas, prompt components, or baseline versions change:
    - Update the baseline `agy` version and Turn-0 token metrics in the summary table.
    - Update the Component & Tool Subset Matrix and verbatim schemas if upstream added or modified built-in tools or prompt blocks.
 
-2. **Update `docs/turn-zero-context.html` & `docs/index.html`**:
+2. **Update `docs/index.html`** (Single Source of Truth):
    - Update the title and header to the new `agy` version tag.
    - Update the stat card token figures (`Default`, `better-agy`, `lean-agy`).
    - If new tools or prompt sections were introduced, add them with appropriate `data-tiers` attributes (`core`, `better`, `lean`, `default`).
-   - Mirror updates to `docs/index.html` (`cp docs/turn-zero-context.html docs/index.html`) to keep the live GitHub Pages deployment in sync.
 
 3. **Update `README.md`**:
    - Update the Turn-0 Benchmark table metrics and baseline CLI version.
    - Update the headline context reduction percentage (e.g. `~70%`).
-   - Confirm links to `docs/turn-zero-context.md` and the GitHub Pages deployment remain intact.
+   - Confirm links to `docs/turn-zero-context.md` and `docs/index.html` (GitHub Pages) remain intact.

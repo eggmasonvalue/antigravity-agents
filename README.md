@@ -31,7 +31,7 @@ agy --agent lean-agy   --output-format json -p "Output 'PONG' and nothing else"
 Both custom agents are **strict functional subsets** of the default Antigravity runtime context:
 
 - 📄 **[Turn-0 Context Specification](docs/turn-zero-context.md)**: Verbatim dump and token accounting for all 17 tool parameter schemas and system prompt XML blocks.
-- 🎨 **[Interactive Turn-0 Overlay (Live Web App)](https://eggmasonvalue.github.io/antigravity-agents/)** ([source](docs/turn-zero-context.html)): Interactive visualizer with segmented toggles to inspect verbatim Turn-0 context and active/pruned subsets across all three profiles.
+- 🎨 **[Interactive Turn-0 Overlay](https://eggmasonvalue.github.io/antigravity-agents/)** ([`docs/index.html`](docs/index.html)): Interactive visualizer with segmented toggles to inspect verbatim Turn-0 context and active/pruned subsets across all three profiles.
 
 ---
 

@@ -2,7 +2,7 @@
 
 This document provides the **verbatim Turn-0 context** injected by the Google Antigravity runtime on session startup for `agy v1.2.2`, along with the exact subset mapping for `better-agy` and `lean-agy`.
 
-Interactive visualizer: [`docs/turn-zero-context.html`](turn-zero-context.html)
+Interactive visualizer: [Live Web App](https://eggmasonvalue.github.io/antigravity-agents/) ([`docs/index.html`](index.html))
 
 ---
 
