@@ -16,7 +16,7 @@
       --core: #2ea043;
       --subagent: #388bfd;
       --pruned: #6e7681;
-      --dim-opacity: 0.16;
+      --dim-opacity: 0.18;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -65,6 +65,13 @@
       font-family: ui-monospace, SFMono-Regular, monospace;
     }
 
+    .controls-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
     /* Segmented Overlay Controller */
     .overlay-controls {
       display: inline-flex;
@@ -106,6 +113,24 @@
       font-weight: 700;
     }
 
+    .toggle-all-btn {
+      background: #21262d;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .toggle-all-btn:hover {
+      color: var(--text-bright);
+      border-color: #58a6ff;
+    }
+
     /* Live Token Ticker */
     .token-ticker {
       font-family: ui-monospace, SFMono-Regular, monospace;
@@ -124,55 +149,129 @@
       padding: 0 24px;
       display: flex;
       flex-direction: column;
-      gap: 28px;
+      gap: 24px;
     }
 
-    .section-title {
+    /* Collapsible Part (Top-level section) */
+    details.part-details {
+      border: 1px solid var(--border);
+      background: #11151c;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    summary.part-summary {
+      list-style: none;
+      padding: 14px 20px;
+      background: #161b22;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
       font-family: ui-monospace, SFMono-Regular, monospace;
       font-size: 0.95rem;
       font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 8px;
-      margin-bottom: 16px;
+      color: var(--text-bright);
+      transition: background 0.15s ease;
     }
 
-    /* Context Block */
-    .context-block {
+    summary.part-summary::-webkit-details-marker { display: none; }
+
+    summary.part-summary:hover {
+      background: #1c212c;
+    }
+
+    details.part-details[open] > summary.part-summary {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .part-title-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chevron-icon {
+      display: inline-block;
+      width: 16px;
+      text-align: center;
+      transition: transform 0.2s ease;
+      color: var(--text-muted);
+    }
+
+    details[open] > summary .chevron-icon {
+      transform: rotate(90deg);
+      color: var(--text-bright);
+    }
+
+    .part-count {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .part-content {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Collapsible Context Block (Individual items) */
+    details.context-block {
       background: var(--panel-bg);
       border: 1px solid var(--border);
       border-radius: 6px;
-      margin-bottom: 14px;
+      overflow: hidden;
       transition: opacity 0.2s ease, border-color 0.2s ease;
     }
 
-    .context-block.dimmed {
+    details.context-block.dimmed {
       opacity: var(--dim-opacity);
     }
 
-    .context-block.dimmed:hover {
+    details.context-block.dimmed:hover {
       opacity: 0.85;
     }
 
-    .context-block.active-core {
+    details.context-block.active-core {
       border-color: var(--core);
     }
 
-    .context-block.active-subagent {
+    details.context-block.active-subagent {
       border-color: var(--subagent);
     }
 
-    .block-header {
-      padding: 8px 16px;
+    summary.block-header {
+      list-style: none;
+      padding: 9px 16px;
       background: rgba(255, 255, 255, 0.02);
-      border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
       font-family: ui-monospace, SFMono-Regular, monospace;
       font-size: 0.82rem;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s ease;
+    }
+
+    summary.block-header::-webkit-details-marker { display: none; }
+
+    summary.block-header:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    details.context-block[open] > summary.block-header {
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .block-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .block-title {
@@ -248,13 +347,18 @@
     <div class="top-container">
       <div class="title-block">
         <h1>ANTIGRAVITY v1.2.2 &mdash; VERBATIM TURN-0 CONTEXT SPECIFICATION</h1>
-        <p>Raw prompt text &amp; parameter schemas with custom agent subset overlays</p>
+        <p>Raw prompt text &amp; parameter schemas with custom agent subset overlays &bull; Collapsed by default</p>
       </div>
 
-      <div class="overlay-controls">
-        <button class="overlay-btn active" data-mode="all" onclick="setOverlay('all')">Default (13,728)</button>
-        <button class="overlay-btn" data-mode="better" onclick="setOverlay('better')">better-agy (6,196)</button>
-        <button class="overlay-btn" data-mode="lean" onclick="setOverlay('lean')">lean-agy (4,078)</button>
+      <div class="controls-row">
+        <div class="overlay-controls">
+          <button class="overlay-btn active" data-mode="all" onclick="setOverlay('all')">Default (13,728)</button>
+          <button class="overlay-btn" data-mode="better" onclick="setOverlay('better')">better-agy (6,196)</button>
+          <button class="overlay-btn" data-mode="lean" onclick="setOverlay('lean')">lean-agy (4,078)</button>
+        </div>
+
+        <button class="toggle-all-btn" onclick="toggleAllSections(true)">Expand All</button>
+        <button class="toggle-all-btn" onclick="toggleAllSections(false)">Collapse All</button>
       </div>
 
       <div class="token-ticker">
@@ -267,16 +371,27 @@
   <main class="content">
 
     <!-- PART 1: TOOL DECLARATIONS -->
-    <section>
-      <div class="section-title">Part 1: Tool Declarations (17 Tools)</div>
-
-      <!-- Core 6 Tools -->
-      <div class="context-block tier-core" data-tiers="core,better,lean">
-        <div class="block-header">
-          <div><span class="block-title">tool_declaration: run_command</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-core">CORE</span>
+    <details class="part-details">
+      <summary class="part-summary">
+        <div class="part-title-left">
+          <span class="chevron-icon">&#9658;</span>
+          <span>PART 1: TOOL DECLARATIONS</span>
         </div>
-        <pre class="code-view">{
+        <span class="part-count">17 Tools (6 Core, 5 Subagents, 6 Pruned)</span>
+      </summary>
+
+      <div class="part-content">
+        <!-- Core 6 Tools -->
+        <details class="context-block tier-core" data-tiers="core,better,lean">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool_declaration: run_command</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-core">CORE</span>
+          </summary>
+          <pre class="code-view">{
   "name": "run_command",
   "description": "PROPOSE a command to run on behalf of the user. Operating System: linux. Shell: bash.\n**NEVER PROPOSE A cd COMMAND**.\nIf you have this tool, note that you DO have the ability to run commands directly on the USER's system.\nMake sure to specify CommandLine exactly as it should be run in the shell.\nIf the step doesn't return the command output, it means that the command was sent to the background as a task. You will receive messages with the command's output as it runs. To interact with a running command, use the manage_task tool. Use `send_input` to send stdin, `kill` to terminate the command, and `status` to check current status. IMPORTANT: Do NOT poll or loop on `status` to wait for completion. The system will automatically notify you with a message when the command finishes. Simply proceed with other work or stop calling tools after launching a command.\nCommands will be run with PAGER=cat. You may want to limit the length of output for commands that usually rely on paging and may contain very long output (e.g. git log, use git log -n <N>).",
   "parameters": {
@@ -293,14 +408,18 @@
     "required": ["Cwd", "WaitMsBeforeAsync", "CommandLine", "toolSummary", "toolAction"]
   }
 }</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-core" data-tiers="core,better,lean">
-        <div class="block-header">
-          <div><span class="block-title">tool_declaration: view_file</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-core">CORE</span>
-        </div>
-        <pre class="code-view">{
+        <details class="context-block tier-core" data-tiers="core,better,lean">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool_declaration: view_file</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-core">CORE</span>
+          </summary>
+          <pre class="code-view">{
   "name": "view_file",
   "description": "View the contents of a file from the local filesystem. This tool supports text files and following binary files: image, pdf, video, audio.\nText file usage:\n- The lines of the file are 1-indexed\n- You can view at most 800 lines at a time\n- Specify StartLine and EndLine to view the lines of the file using slice notation:\n  - Omit both to view the entire file, or the first 800 lines of the file, whichever is smaller.\n  - Specify StartLine only to view the remaining lines of the file, or the next 800 lines, whichever is smaller\n  - Specify EndLine only to view the remaining preceding lines of the file, or the previous 800 lines, whichever is smaller\n  - Specify both to view a precise line range. This range must be smaller than 800 lines or only the first 800 lines of the range will be shown.\n- Content is limited to 46080 bytes per view. If content is truncated, use the ContentOffset parameter to view the remaining content\nBinary file usage:\n- Do not provide StartLine or EndLine arguments, this tool always returns the entire file\n- Files larger than 100 MB cannot be viewed.",
   "parameters": {
@@ -316,14 +435,18 @@
     "required": ["AbsolutePath", "toolSummary", "toolAction"]
   }
 }</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-core" data-tiers="core,better,lean">
-        <div class="block-header">
-          <div><span class="block-title">tool_declaration: replace_file_content</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-core">CORE</span>
-        </div>
-        <pre class="code-view">{
+        <details class="context-block tier-core" data-tiers="core,better,lean">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool_declaration: replace_file_content</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-core">CORE</span>
+          </summary>
+          <pre class="code-view">{
   "name": "replace_file_content",
   "description": "Use this tool to edit an existing file. Follow these rules:\n1. Use this tool ONLY when you are making a SINGLE CONTIGUOUS block of edits to the same file (i.e. replacing a single contiguous block of text).\n2. Do NOT make multiple parallel calls to this tool for the same file.\n3. To edit multiple, non-adjacent lines of code in the same file, make multiple calls to this tool.\n4. For the ReplacementChunk, specify StartLine, EndLine, TargetContent and ReplacementContent. StartLine and EndLine should specify a range of lines containing precisely the instances of TargetContent that you wish to edit. To edit a single instance of the TargetContent, the range should be such that it contains that specific instance of the TargetContent and no other instances. In TargetContent, specify the precise lines of code to edit. These lines MUST EXACTLY MATCH text in the existing file content. In ReplacementContent, specify the replacement content for the specified target content. This must be a complete drop-in replacement of the TargetContent, with necessary modifications made.\n5. If you are making multiple edits across a single file, make multiple calls to this tool. DO NOT try to replace the entire existing content with the new content, this is very expensive.\n6. You may not edit file extensions: [.ipynb]",
   "parameters": {
@@ -344,14 +467,18 @@
     "required": ["TargetFile", "Instruction", "Description", "AllowMultiple", "TargetContent", "ReplacementContent", "StartLine", "EndLine", "toolSummary", "toolAction"]
   }
 }</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-core" data-tiers="core,better,lean">
-        <div class="block-header">
-          <div><span class="block-title">tool_declaration: write_to_file</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-core">CORE</span>
-        </div>
-        <pre class="code-view">{
+        <details class="context-block tier-core" data-tiers="core,better,lean">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool_declaration: write_to_file</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-core">CORE</span>
+          </summary>
+          <pre class="code-view">{
   "name": "write_to_file",
   "description": "Use this tool to create new files. The file and any parent directories will be created for you if they do not already exist.\nFollow these instructions:\n1. By default this tool will error if TargetFile already exists. To overwrite an existing file, set Overwrite to true.\n2. When creating an artifact, always provide ArtifactMetadata. When creating non-artifact files, do not provide it.",
   "parameters": {
@@ -376,14 +503,18 @@
     "required": ["TargetFile", "Overwrite", "CodeContent", "Description", "toolSummary", "toolAction"]
   }
 }</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-core" data-tiers="core,better,lean">
-        <div class="block-header">
-          <div><span class="block-title">tool_declaration: search_web</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-core">CORE</span>
-        </div>
-        <pre class="code-view">{
+        <details class="context-block tier-core" data-tiers="core,better,lean">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool_declaration: search_web</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-core">CORE</span>
+          </summary>
+          <pre class="code-view">{
   "name": "search_web",
   "description": "Performs a web search for a given query. Returns a summary of relevant information along with URL citations.",
   "parameters": {
@@ -397,14 +528,18 @@
     "required": ["query", "toolSummary", "toolAction"]
   }
 }</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-core" data-tiers="core,better,lean">
-        <div class="block-header">
-          <div><span class="block-title">tool_declaration: read_url_content</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-core">CORE</span>
-        </div>
-        <pre class="code-view">{
+        <details class="context-block tier-core" data-tiers="core,better,lean">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool_declaration: read_url_content</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-core">CORE</span>
+          </summary>
+          <pre class="code-view">{
   "name": "read_url_content",
   "description": "Fetch content from a URL via HTTP request (invisible to USER). Use when: (1) extracting text from public pages, (2) reading static content/documentation, (3) batch processing multiple URLs, (4) speed is important, or (5) no visual interaction needed. Converts HTML to markdown. No JavaScript execution, no authentication. For pages requiring login, JavaScript, or USER visibility, use read_browser_page instead.",
   "parameters": {
@@ -417,15 +552,19 @@
     "required": ["Url", "toolSummary", "toolAction"]
   }
 }</pre>
-      </div>
+        </details>
 
-      <!-- Subagent 5 Tools -->
-      <div class="context-block tier-subagent" data-tiers="subagent,better">
-        <div class="block-header">
-          <div><span class="block-title">tool_declaration: invoke_subagent</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-subagent">SUBAGENTS</span>
-        </div>
-        <pre class="code-view">{
+        <!-- Subagent 5 Tools -->
+        <details class="context-block tier-subagent" data-tiers="subagent,better">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool_declaration: invoke_subagent</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-subagent">SUBAGENTS</span>
+          </summary>
+          <pre class="code-view">{
   "name": "invoke_subagent",
   "description": "Invokes one or more subagents by name with a single tool call. Each subagent runs in the background with its own prompt and reports back when done.\nSpecify the Subagents array with one or more entries. Each entry defines a subagent to launch.",
   "parameters": {
@@ -451,14 +590,18 @@
     "required": ["Subagents", "toolSummary", "toolAction"]
   }
 }</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-subagent" data-tiers="subagent,better">
-        <div class="block-header">
-          <div><span class="block-title">tool_declaration: define_subagent</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-subagent">SUBAGENTS</span>
-        </div>
-        <pre class="code-view">{
+        <details class="context-block tier-subagent" data-tiers="subagent,better">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool_declaration: define_subagent</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-subagent">SUBAGENTS</span>
+          </summary>
+          <pre class="code-view">{
   "name": "define_subagent",
   "description": "Defines a new type of subagent that can be invoked via invoke_subagent.",
   "parameters": {
@@ -476,14 +619,18 @@
     "required": ["name", "description", "system_prompt", "toolSummary", "toolAction"]
   }
 }</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-subagent" data-tiers="subagent,better">
-        <div class="block-header">
-          <div><span class="block-title">tool_declaration: send_message</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-subagent">SUBAGENTS</span>
-        </div>
-        <pre class="code-view">{
+        <details class="context-block tier-subagent" data-tiers="subagent,better">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool_declaration: send_message</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-subagent">SUBAGENTS</span>
+          </summary>
+          <pre class="code-view">{
   "name": "send_message",
   "description": "Send a message to another agent. This tool can be used to communicate with subagents, peer agents, etc. Do not use this tool to communicate with the user.",
   "parameters": {
@@ -497,14 +644,18 @@
     "required": ["Recipient", "Message", "toolSummary", "toolAction"]
   }
 }</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-subagent" data-tiers="subagent,better">
-        <div class="block-header">
-          <div><span class="block-title">tool_declaration: manage_subagents</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-subagent">SUBAGENTS</span>
-        </div>
-        <pre class="code-view">{
+        <details class="context-block tier-subagent" data-tiers="subagent,better">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool_declaration: manage_subagents</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-subagent">SUBAGENTS</span>
+          </summary>
+          <pre class="code-view">{
   "name": "manage_subagents",
   "description": "Manage existing subagents. Actions: 'list' (list active direct subagents), 'kill' (terminate specific subagents and descendants), 'kill_all' (terminate all subagents).",
   "parameters": {
@@ -518,14 +669,18 @@
     "required": ["Action", "toolSummary", "toolAction"]
   }
 }</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-subagent" data-tiers="subagent,better">
-        <div class="block-header">
-          <div><span class="block-title">tool_declaration: manage_task</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-subagent">SUBAGENTS</span>
-        </div>
-        <pre class="code-view">{
+        <details class="context-block tier-subagent" data-tiers="subagent,better">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool_declaration: manage_task</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-subagent">SUBAGENTS</span>
+          </summary>
+          <pre class="code-view">{
   "name": "manage_task",
   "description": "Manage background tasks. Use this tool to list running tasks or interact with tasks that were sent to the background.\nActions:\n- 'list': List all currently running background tasks\n- 'kill': Cancel the task's execution\n- 'status': Check the task's current status and log file location\n- 'send_input': Send input to a running task",
   "parameters": {
@@ -540,15 +695,19 @@
     "required": ["Action", "toolSummary", "toolAction"]
   }
 }</pre>
-      </div>
+        </details>
 
-      <!-- Pruned 6 Tools -->
-      <div class="context-block tier-pruned" data-tiers="default">
-        <div class="block-header">
-          <div><span class="block-title">tool_declaration: list_dir</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-pruned">DEFAULT ONLY</span>
-        </div>
-        <pre class="code-view">{
+        <!-- Pruned 6 Tools -->
+        <details class="context-block tier-pruned" data-tiers="default">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool_declaration: list_dir</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-pruned">DEFAULT ONLY</span>
+          </summary>
+          <pre class="code-view">{
   "name": "list_dir",
   "description": "List the contents of a directory, i.e. all files and subdirectories that are children of the directory. Directory path must be an absolute path to a directory that exists.",
   "parameters": {
@@ -561,14 +720,18 @@
     "required": ["DirectoryPath", "toolSummary", "toolAction"]
   }
 }</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-pruned" data-tiers="default">
-        <div class="block-header">
-          <div><span class="block-title">tool_declaration: grep_search</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-pruned">DEFAULT ONLY</span>
-        </div>
-        <pre class="code-view">{
+        <details class="context-block tier-pruned" data-tiers="default">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool_declaration: grep_search</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-pruned">DEFAULT ONLY</span>
+          </summary>
+          <pre class="code-view">{
   "name": "grep_search",
   "description": "Use ripgrep to find exact pattern matches within files or directories.",
   "parameters": {
@@ -586,14 +749,18 @@
     "required": ["SearchPath", "Query", "toolSummary", "toolAction"]
   }
 }</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-pruned" data-tiers="default">
-        <div class="block-header">
-          <div><span class="block-title">tool_declaration: find_by_name</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-pruned">DEFAULT ONLY</span>
-        </div>
-        <pre class="code-view">{
+        <details class="context-block tier-pruned" data-tiers="default">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool_declaration: find_by_name</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-pruned">DEFAULT ONLY</span>
+          </summary>
+          <pre class="code-view">{
   "name": "find_by_name",
   "description": "Search for files and subdirectories within a specified directory using fd.\nSearch uses smart case and will ignore gitignored files by default.",
   "parameters": {
@@ -612,14 +779,18 @@
     "required": ["SearchDirectory", "Pattern", "toolSummary", "toolAction"]
   }
 }</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-pruned" data-tiers="default">
-        <div class="block-header">
-          <div><span class="block-title">tool_declaration: ask_question</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-pruned">DEFAULT ONLY</span>
-        </div>
-        <pre class="code-view">{
+        <details class="context-block tier-pruned" data-tiers="default">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool_declaration: ask_question</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-pruned">DEFAULT ONLY</span>
+          </summary>
+          <pre class="code-view">{
   "name": "ask_question",
   "description": "Use this tool to ask the user one or more multiple-choice questions, with the goal of: Clarifying underspecified requirements, Soliciting design feedback or user preferences, Addressing ambiguous user intent, Picking a solution from a list of options.",
   "parameters": {
@@ -643,14 +814,18 @@
     "required": ["questions", "toolSummary", "toolAction"]
   }
 }</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-pruned" data-tiers="default">
-        <div class="block-header">
-          <div><span class="block-title">tool_declaration: generate_image</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-pruned">DEFAULT ONLY</span>
-        </div>
-        <pre class="code-view">{
+        <details class="context-block tier-pruned" data-tiers="default">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool_declaration: generate_image</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-pruned">DEFAULT ONLY</span>
+          </summary>
+          <pre class="code-view">{
   "name": "generate_image",
   "description": "Generate an image or edit existing images based on a text prompt. The resulting image will be saved as an artifact for use.",
   "parameters": {
@@ -666,14 +841,18 @@
     "required": ["Prompt", "ImageName", "toolSummary", "toolAction"]
   }
 }</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-pruned" data-tiers="default">
-        <div class="block-header">
-          <div><span class="block-title">tool_declaration: schedule</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-pruned">DEFAULT ONLY</span>
-        </div>
-        <pre class="code-view">{
+        <details class="context-block tier-pruned" data-tiers="default">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool_declaration: schedule</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-pruned">DEFAULT ONLY</span>
+          </summary>
+          <pre class="code-view">{
   "name": "schedule",
   "description": "Schedule a one-shot timer or a recurring cron job that sends notifications in the background.",
   "parameters": {
@@ -690,31 +869,47 @@
     "required": ["Prompt", "toolSummary", "toolAction"]
   }
 }</pre>
+        </details>
       </div>
-    </section>
+    </details>
 
     <!-- PART 2: SYSTEM INSTRUCTIONS -->
-    <section>
-      <div class="section-title">Part 2: System Instructions (XML Sections)</div>
-
-      <div class="context-block tier-core" data-tiers="core,better,lean">
-        <div class="block-header">
-          <div><span class="block-title">&lt;identity&gt;</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-core">CORE</span>
+    <details class="part-details">
+      <summary class="part-summary">
+        <div class="part-title-left">
+          <span class="chevron-icon">&#9658;</span>
+          <span>PART 2: SYSTEM INSTRUCTIONS</span>
         </div>
-        <pre class="code-view">&lt;identity&gt;
+        <span class="part-count">10 XML Sections (3 Core, 7 Pruned)</span>
+      </summary>
+
+      <div class="part-content">
+        <details class="context-block tier-core" data-tiers="core,better,lean">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">&lt;identity&gt;</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-core">CORE</span>
+          </summary>
+          <pre class="code-view">&lt;identity&gt;
 You are Antigravity, a powerful agentic AI coding assistant designed by the Google Deepmind team working on Advanced Agentic Coding.
 You are pair programming with a USER to solve their coding task. The task may require creating a new codebase, modifying or debugging an existing codebase, or simply answering a question.
 The USER will send you requests, which you must always prioritize addressing. User requests are enclosed within &lt;USER_REQUEST&gt; tags.
 &lt;/identity&gt;</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-core" data-tiers="core,better,lean">
-        <div class="block-header">
-          <div><span class="block-title">&lt;user_information&gt;</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-core">CORE</span>
-        </div>
-        <pre class="code-view">&lt;user_information&gt;
+        <details class="context-block tier-core" data-tiers="core,better,lean">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">&lt;user_information&gt;</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-core">CORE</span>
+          </summary>
+          <pre class="code-view">&lt;user_information&gt;
 The USER's OS version is linux.
 The user has 1 active workspaces, each defined by a URI and a CorpusName. Multiple URIs potentially map to the same CorpusName. The mapping is shown as follows in the format [URI] -&gt; [CorpusName]:
 /home/.../antigravity-agents -&gt; .../antigravity-agents
@@ -722,14 +917,18 @@ Code relating to the user's requests should be written in the locations listed a
 App Data Directory: /home/.../.gemini/antigravity-cli
 Conversation ID: ce9bb6c6-9922-40e1-93cb-fb64b3bf3d35
 &lt;/user_information&gt;</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-core" data-tiers="core,better,lean">
-        <div class="block-header">
-          <div><span class="block-title">&lt;skills&gt;</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-core">CORE</span>
-        </div>
-        <pre class="code-view">&lt;skills&gt;
+        <details class="context-block tier-core" data-tiers="core,better,lean">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">&lt;skills&gt;</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-core">CORE</span>
+          </summary>
+          <pre class="code-view">&lt;skills&gt;
 You can use specialized 'skills' to help you with complex tasks. Each skill has a name and a description listed below.
 
 Skills are folders of instructions, scripts, and resources that extend your capabilities for specialized tasks. Each skill folder contains:
@@ -751,14 +950,18 @@ Available skills:
 - agy-customizations (/home/.../SKILL.md): Comprehensive guide and reference for the Antigravity Customization System.
 - antigravity-guide (/home/.../SKILL.md): Provides a comprehensive guide, quick reference, and sitemap for Google Antigravity.
 &lt;/skills&gt;</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-pruned" data-tiers="default">
-        <div class="block-header">
-          <div><span class="block-title">&lt;subagents&gt;</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-pruned">DEFAULT ONLY</span>
-        </div>
-        <pre class="code-view">&lt;subagents&gt;
+        <details class="context-block tier-pruned" data-tiers="default">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">&lt;subagents&gt;</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-pruned">DEFAULT ONLY</span>
+          </summary>
+          <pre class="code-view">&lt;subagents&gt;
 ## Invoking Subagents
 
 Subagents can be invoked using the invoke_subagent tool. You can invoke an existing subagent by name, or define a new subagent for this conversation using the define_subagent tool, and then invoke it. Agents defined by the define_subagent tool are available for the duration of this conversation. After launching a subagent, you do NOT need to poll or check your inbox in a loop. The system will automatically notify you when the subagent sends a message. Simply proceed with other work or stop calling tools, and you will be notified when there is a message to process.
@@ -775,14 +978,18 @@ Available subagents:
 
 After launching a subagent, you do NOT need to poll or check your inbox in a loop. The system will automatically notify you when the subagent sends a message. Simply proceed with other work or stop calling tools, and you will be notified when there is a message to process.
 &lt;/subagents&gt;</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-pruned" data-tiers="default">
-        <div class="block-header">
-          <div><span class="block-title">&lt;messaging&gt;</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-pruned">DEFAULT ONLY</span>
-        </div>
-        <pre class="code-view">&lt;messaging&gt;
+        <details class="context-block tier-pruned" data-tiers="default">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">&lt;messaging&gt;</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-pruned">DEFAULT ONLY</span>
+          </summary>
+          <pre class="code-view">&lt;messaging&gt;
 You are connected to a messaging system where you may receive messages from: agents, background tasks, user-queued messages.
 
 ## Receiving Messages
@@ -798,14 +1005,18 @@ The system automatically resumes your execution when:
 
 This means you do **NOT** need to poll in a loop while waiting for messages or updates. After launching anything that performs work asynchronously, you may continue other work or simply stop by calling no more tools. The system will notify you when there is something to process.
 &lt;/messaging&gt;</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-pruned" data-tiers="default">
-        <div class="block-header">
-          <div><span class="block-title">&lt;conversation_transcript&gt;</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-pruned">DEFAULT ONLY</span>
-        </div>
-        <pre class="code-view">&lt;conversation_transcript&gt;
+        <details class="context-block tier-pruned" data-tiers="default">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">&lt;conversation_transcript&gt;</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-pruned">DEFAULT ONLY</span>
+          </summary>
+          <pre class="code-view">&lt;conversation_transcript&gt;
 Transcripts are located directly at `&lt;appDataDir&gt;/brain/&lt;conversation-id&gt;/.system_generated/logs/transcript.jsonl` (and `transcript_full.jsonl`).
 - Start with `transcript.jsonl` (compact). When `truncated_fields` is present, read only the specific corresponding line in `transcript_full.jsonl`.
 - Search subagents by grepping `invoke_subagent` in `transcript.jsonl`.
@@ -824,14 +1035,18 @@ Each JSON object contains fields such as:
 - `tool_calls`: An array of tool calls made in this step, including their arguments.
 - `truncated_fields`: An array of field names that were truncated.
 &lt;/conversation_transcript&gt;</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-pruned" data-tiers="default">
-        <div class="block-header">
-          <div><span class="block-title">&lt;artifacts&gt;</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-pruned">DEFAULT ONLY</span>
-        </div>
-        <pre class="code-view">&lt;artifacts&gt;
+        <details class="context-block tier-pruned" data-tiers="default">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">&lt;artifacts&gt;</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-pruned">DEFAULT ONLY</span>
+          </summary>
+          <pre class="code-view">&lt;artifacts&gt;
 Artifacts are special markdown (.md) documents that you can create to present structured information to the user.
 All artifacts should be written to the artifact directory: `&lt;appDataDir&gt;/brain/&lt;conversation-id&gt;`. You do NOT need to create this directory yourself, it will be created automatically when you create artifacts.
 
@@ -846,14 +1061,18 @@ All artifacts should be written to the artifact directory: `&lt;appDataDir&gt;/b
 ## Carousels: ````carousel syntax with &lt;!-- slide --&gt;
 # Scratch Scripts and Files: &lt;appDataDir&gt;/brain/&lt;conversation-id&gt;/scratch/
 &lt;/artifacts&gt;</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-pruned" data-tiers="default">
-        <div class="block-header">
-          <div><span class="block-title">&lt;slash_commands&gt;</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-pruned">DEFAULT ONLY</span>
-        </div>
-        <pre class="code-view">&lt;slash_commands&gt;
+        <details class="context-block tier-pruned" data-tiers="default">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">&lt;slash_commands&gt;</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-pruned">DEFAULT ONLY</span>
+          </summary>
+          <pre class="code-view">&lt;slash_commands&gt;
 Slash commands are user-facing shortcuts in the chat UI (e.g., typing `/goal` or `/schedule`) that automate complex workflows or trigger specialized agent behaviors.
 You cannot execute these commands yourself. Your role is to recommend them to the user when they are a good fit for the task at hand, encouraging the user to explore and trigger them.
 
@@ -867,14 +1086,18 @@ Available slash commands you can recommend to the user:
 - /learn: Persist custom setup or learned behaviors.
 - /boost: Deep thinking and multi-agent reasoning hierarchy.
 &lt;/slash_commands&gt;</pre>
-      </div>
+        </details>
 
-      <div class="context-block tier-pruned" data-tiers="default">
-        <div class="block-header">
-          <div><span class="block-title">&lt;guidelines&gt; &amp; &lt;communication_style&gt;</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-pruned">DEFAULT ONLY</span>
-        </div>
-        <pre class="code-view">&lt;guidelines&gt;
+        <details class="context-block tier-pruned" data-tiers="default">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">&lt;guidelines&gt; &amp; &lt;communication_style&gt;</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-pruned">DEFAULT ONLY</span>
+          </summary>
+          <pre class="code-view">&lt;guidelines&gt;
 Follow these behavioral guidelines at all times:
 - Maintain documentation integrity. Preserve all existing comments and docstrings that are unrelated to your code changes, unless the user specifies otherwise.
 &lt;/guidelines&gt;
@@ -884,24 +1107,37 @@ Follow these behavioral guidelines at all times:
 - If you're unsure about the user's intent, ask for clarification rather than making assumptions.
 - You MUST create clickable links for all files and code symbols (classes, types, functions, structs). Use github style markdown links with the file:// scheme (e.g., [utils.py](file:///path/to/utils.py) or [`ClassName`](file:///path/to/utils.py#L10-L20)). For Windows, use forward slashes for paths.
 &lt;/communication_style&gt;</pre>
+        </details>
       </div>
-    </section>
+    </details>
 
     <!-- PART 3: CUSTOM AGENT DIRECTIVES -->
-    <section>
-      <div class="section-title">Part 3: Custom Directives (# Principles)</div>
-
-      <div class="context-block tier-core" data-tiers="core,better,lean">
-        <div class="block-header">
-          <div><span class="block-title"># Principles (better-agy &amp; lean-agy Markdown Body)</span> <span class="status-pill"></span></div>
-          <span class="block-tag tag-core">CUSTOM</span>
+    <details class="part-details">
+      <summary class="part-summary">
+        <div class="part-title-left">
+          <span class="chevron-icon">&#9658;</span>
+          <span>PART 3: CUSTOM DIRECTIVES (# Principles)</span>
         </div>
-        <pre class="code-view"># Principles
+        <span class="part-count">Injected in better-agy &amp; lean-agy (~80 tokens)</span>
+      </summary>
+
+      <div class="part-content">
+        <details class="context-block tier-core" data-tiers="core,better,lean">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title"># Principles (better-agy &amp; lean-agy Markdown Body)</span>
+              <span class="status-pill"></span>
+            </div>
+            <span class="block-tag tag-core">CUSTOM</span>
+          </summary>
+          <pre class="code-view"># Principles
 
 - **Context Discipline**: Context window capacity is finite and irreversible. Every token emitted by tools carries an ongoing operational cost. All commands, queries, listings, searches, and file reads must be strictly bounded in output before execution. Never emit unmetered, verbose, or streaming output directly into context. When dealing with potentially voluminous data, filter or redirect at the source and inspect defensively.
 - **Direct Communication**: Deliver concise, precise, and direct responses without conversational filler, boilerplate pleasantries, or unprompted recaps of modified files.</pre>
+        </details>
       </div>
-    </section>
+    </details>
 
   </main>
 
@@ -984,6 +1220,17 @@ Follow these behavioral guidelines at all times:
       });
     }
 
+    function toggleAllSections(open) {
+      document.querySelectorAll('details.part-details, details.context-block').forEach(el => {
+        if (open) {
+          el.setAttribute('open', '');
+        } else {
+          el.removeAttribute('open');
+        }
+      });
+    }
+
+    // Default initialization
     setOverlay('all');
   </script>
 </body>
