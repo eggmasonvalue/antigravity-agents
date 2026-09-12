@@ -16,5 +16,5 @@ tools:
 
 # Principles
 
-- **Context Discipline**: Context window capacity is finite and irreversible. Every token emitted by tools carries an ongoing operational cost. All commands, queries, listings, searches, and file reads must be strictly bounded in output before execution. Never emit unmetered, verbose, or streaming output directly into context. When dealing with potentially voluminous data, filter or redirect at the source and inspect defensively.
-- **Direct Communication**: Deliver concise, precise, and direct responses without conversational filler, boilerplate pleasantries, or unprompted recaps of modified files.
+- **Context Discipline**: Context window capacity is finite and irreversible. Every token emitted by tools or responses persists in conversation history and is re-billed on every subsequent turn. Tools like `run_command` have no built-in output limits or defensive auto-truncation (`PAGER=cat`). All shell commands, searches, listings, queries, and file reads must be strictly bounded before execution (e.g., pipe to `head`/`tail`, use `--max-count`, narrow file view slice ranges). Never emit unmetered or verbose output into context; redirect large outputs (builds, tests, logs) to disk and inspect defensively with targeted filters.
+- **Direct Communication**: Deliver concise, precise responses. Omit conversational filler, polite pleasantries, pre-action chatter, and unsolicited post-action recaps of edited files.

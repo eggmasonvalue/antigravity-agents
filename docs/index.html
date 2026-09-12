@@ -330,8 +330,8 @@
       <div class="controls-row">
         <div class="overlay-controls">
           <button class="overlay-btn active" data-mode="all" onclick="setOverlay('all')">Default (13,728)</button>
-          <button class="overlay-btn" data-mode="better" onclick="setOverlay('better')">better-agy (6,196)</button>
-          <button class="overlay-btn" data-mode="lean" onclick="setOverlay('lean')">lean-agy (4,078)</button>
+          <button class="overlay-btn" data-mode="better" onclick="setOverlay('better')">better-agy (6,259)</button>
+          <button class="overlay-btn" data-mode="lean" onclick="setOverlay('lean')">lean-agy (4,141)</button>
         </div>
 
         <button class="toggle-all-btn" onclick="toggleAllSections(true)">Expand All</button>
@@ -1083,8 +1083,8 @@ Follow these behavioral guidelines at all times:
           </summary>
           <pre class="code-view"># Principles
 
-- **Context Discipline**: Context window capacity is finite and irreversible. Every token emitted by tools carries an ongoing operational cost. All commands, queries, listings, searches, and file reads must be strictly bounded in output before execution. Never emit unmetered, verbose, or streaming output directly into context. When dealing with potentially voluminous data, filter or redirect at the source and inspect defensively.
-- **Direct Communication**: Deliver concise, precise, and direct responses without conversational filler, boilerplate pleasantries, or unprompted recaps of modified files.</pre>
+- **Context Discipline**: Context window capacity is finite and irreversible. Every token emitted by tools or responses persists in conversation history and is re-billed on every subsequent turn. Tools like `run_command` have no built-in output limits or defensive auto-truncation (`PAGER=cat`). All shell commands, searches, listings, queries, and file reads must be strictly bounded before execution (e.g., pipe to `head`/`tail`, use `--max-count`, narrow file view slice ranges). Never emit unmetered or verbose output into context; redirect large outputs (builds, tests, logs) to disk and inspect defensively with targeted filters.
+- **Direct Communication**: Deliver concise, precise responses. Omit conversational filler, polite pleasantries, pre-action chatter, and unsolicited post-action recaps of edited files.</pre>
         </details>
       </div>
     </details>
@@ -1109,12 +1109,12 @@ Follow these behavioral guidelines at all times:
         redEl.textContent = '(Baseline)';
         redEl.style.color = 'var(--text-muted)';
       } else if (mode === 'better') {
-        tokenEl.textContent = '6,196';
-        redEl.textContent = '(-54.9% cut)';
+        tokenEl.textContent = '6,259';
+        redEl.textContent = '(-54.4% cut)';
         redEl.style.color = 'var(--accent-blue)';
       } else if (mode === 'lean') {
-        tokenEl.textContent = '4,078';
-        redEl.textContent = '(-70.3% cut)';
+        tokenEl.textContent = '4,141';
+        redEl.textContent = '(-69.8% cut)';
         redEl.style.color = 'var(--accent-green)';
       }
 
