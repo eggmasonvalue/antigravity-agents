@@ -13,8 +13,8 @@ Measured using `agy --output-format json -p "Output 'PONG' and nothing else"`:
 | Profile | Base Tokens | Delta vs Default | Tools Declared | System Prompt Components |
 | :--- | :---: | :---: | :---: | :--- |
 | **Default Agent** | `13,728` | Baseline | 17 tools | All 10 built-in XML sections |
-| **`better-agy`** | `6,196` | -7,532 (-54.9%) | 11 tools | Minimal meta + custom `# Principles` |
-| **`lean-agy`** | `4,078` | -9,650 (-70.3%) | 6 tools | Minimal meta + custom `# Principles` |
+| **`better-agy`** | `6,259` | -7,469 (-54.4%) | 11 tools | Minimal meta + custom `# Principles` |
+| **`lean-agy`** | `4,141` | -9,587 (-69.8%) | 6 tools | Minimal meta + custom `# Principles` |
 
 ---
 
@@ -638,6 +638,10 @@ The following markdown principles replace the ~3,000 tokens of boilerplate instr
 ```markdown
 # Principles
 
-- **Context Discipline**: Context window capacity is finite and irreversible. Every token emitted by tools carries an ongoing operational cost. All commands, queries, listings, searches, and file reads must be strictly bounded in output before execution. Never emit unmetered, verbose, or streaming output directly into context. When dealing with potentially voluminous data, filter or redirect at the source and inspect defensively.
-- **Direct Communication**: Deliver concise, precise, and direct responses without conversational filler, boilerplate pleasantries, or unprompted recaps of modified files.
+- **Context Discipline**: Context window capacity is finite and irreversible. Every token emitted by tools or responses persists in conversation history and is re-billed on every subsequent turn. Tools like `run_command` have no built-in output limits or defensive auto-truncation (`PAGER=cat`). All shell commands, searches, listings, queries, and file reads must be strictly bounded before execution (e.g., pipe to `head`/`tail`, use `--max-count`, narrow file view slice ranges). Never emit unmetered or verbose output into context; redirect large outputs (builds, tests, logs) to disk and inspect defensively with targeted filters.
+- **Direct Communication**: Deliver concise, precise responses. Omit conversational filler, polite pleasantries, pre-action chatter, and unsolicited post-action recaps of edited files.
 ```
+
+> [!TIP]
+> For the complete breakdown of through-session token economics, tool runtime vulnerabilities (e.g., `run_command` unmetered stdout dumping), and why each principle clause earns its place, see the [Beyond Turn 0: Through-Session Economics in README.md](../README.md#-beyond-turn-0-through-session-economics--why-the-principles-earn-their-place).
+
