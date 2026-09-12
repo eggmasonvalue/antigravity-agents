@@ -26,12 +26,12 @@ agy --agent lean-agy   --output-format json -p "Output 'PONG' and nothing else"
 
 ---
 
-## 🔍 Turn-0 Context Transparency & Interactive Overlay
+## 🔍 Verbatim Turn-0 Context & Subsets
 
-Both custom agents are **strict functional subsets** of the default Antigravity agent. To inspect every prompt section and tool schema retained or pruned:
+Both custom agents are **strict functional subsets** of the default Antigravity runtime context:
 
-- 📄 **[Turn-0 Context Breakdown Guide](docs/turn-zero-context.md)**: A complete markdown matrix comparing all 17 tools and prompt sections, with detailed rationale addressing user anxiety.
-- 🎨 **[Interactive Turn-0 Overlay (HTML)](docs/turn-zero-context.html)**: A single-page, color-coded visualizer where you can toggle between the Default baseline and overlays for `better-agy` and `lean-agy` to see exactly what remains active and what is pruned.
+- 📄 **[Turn-0 Context Specification](docs/turn-zero-context.md)**: Verbatim dump and token accounting for all 17 tool parameter schemas and system prompt XML blocks.
+- 🎨 **[Interactive Turn-0 Overlay (HTML)](docs/turn-zero-context.html)**: Monospace code visualizer with segmented toggles to inspect verbatim Turn-0 context and active/pruned subsets across all three profiles.
 
 ---
 
