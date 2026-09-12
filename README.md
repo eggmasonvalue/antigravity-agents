@@ -1,6 +1,6 @@
 # Antigravity Agents
 
-> **Eliminate up to ~53% of Antigravity's hidden turn-zero context tax with near-zero loss in functionality.**
+> **Eliminate up to ~70% of Antigravity's hidden turn-zero context tax with near-zero loss in functionality.**
 
 Every time you launch a default Google Antigravity session, the platform silently injects **~14,000 input tokens** of verbose tool descriptor schemas, prescriptive web-styling rules, and unused feature manifests before you even write your first prompt.
 
@@ -8,7 +8,7 @@ This repository provides two high-performance, context-disciplined custom agents
 
 ---
 
-### Turn-0 Benchmark (`agy v1.1.27`)
+### Turn-0 Benchmark (`agy v1.2.2`)
 
 ```bash
 # Verify programmatically on your own machine:
@@ -18,11 +18,20 @@ agy --agent lean-agy   --output-format json -p "Output 'PONG' and nothing else"
 
 | Agent Configuration | Turn-0 Base Tokens | Context Tax Reduction | Architecture & Trade-Off |
 | :--- | :---: | :---: | :--- |
-| **Default Antigravity Agent** | `13,899` tokens | Baseline | 17 built-in tools with full schema overhead |
-| **`better-agy`** | **`8,600` tokens** | **-5,299 tokens (~38.1% cut)** | 11 tools; retains native IDE subagent orchestration tools & UI panels |
-| **`lean-agy`** | **`6,474` tokens** | **-7,425 tokens (~53.4% cut)** | 6 core tools; subagent delegation offloaded to on-demand `agy-subagents` skill |
+| **Default Antigravity Agent** | `13,728` tokens | Baseline | 17 built-in tools with full schema overhead + default boilerplate |
+| **`better-agy`** | **`6,196` tokens** | **-7,532 tokens (~54.9% cut)** | 11 tools; retains native IDE subagent orchestration tools & UI panels; excludes prompt boilerplate |
+| **`lean-agy`** | **`4,078` tokens** | **-9,650 tokens (~70.3% cut)** | 6 core tools; excludes prompt boilerplate; subagent delegation offloaded to on-demand `agy-subagents` skill |
 
 *(Run the `/context` slash command inside any interactive session to inspect your live breakdown).*
+
+---
+
+## 🔍 Verbatim Turn-0 Context & Subsets
+
+Both custom agents are **strict functional subsets** of the default Antigravity runtime context:
+
+- 📄 **[Turn-0 Context Specification](docs/turn-zero-context.md)**: Verbatim dump and token accounting for all 17 tool parameter schemas and system prompt XML blocks.
+- 🎨 **[Interactive Turn-0 Overlay](https://eggmasonvalue.github.io/antigravity-agents/)** ([`docs/index.html`](docs/index.html)): Interactive visualizer with segmented toggles to inspect verbatim Turn-0 context and active/pruned subsets across all three profiles.
 
 ---
 
@@ -45,12 +54,14 @@ irm https://raw.githubusercontent.com/eggmasonvalue/antigravity-agents/main/scri
 ### 1. `better-agy` (Balanced + UI Subagents)
 A lightweight software engineering agent for users who want token savings while keeping native subagent tools and IDE side-panel integration.
 * **Tools Kept (11)**: `run_command`, `view_file`, `replace_file_content`, `write_to_file`, `search_web`, `read_url_content`, `invoke_subagent`, `define_subagent`, `send_message`, `manage_subagents`, `manage_task`.
-* **Pruned (6)**: `list_dir`, `grep_search`, `find_by_name` (subsumed by shell), `ask_question` (plain chat/artifacts), `generate_image`, `schedule`.
+* **Pruned (6)**: `list_dir`, `grep_search`, `find_by_name` (subsumed by shell), `ask_question` (plain chat), `generate_image`, `schedule`.
+* **System Prompt**: Uses `excludeDefaultComponents: true` to prune ~3,000 tokens of verbose formatting rules.
 
 ### 2. `lean-agy` (Ultra-Minimal Shell-First + Skill-Driven Subagents)
 An ultra-lean agent for maximum context runway. Drops all built-in subagent tool schemas from the system prompt on Turn 0. When delegation or parallelization is needed, it dynamically leverages the `agy-subagents` skill via `run_command`.
 * **Tools Kept (6)**: `run_command`, `view_file`, `replace_file_content`, `write_to_file`, `search_web`, `read_url_content`.
 * **Pruned (11)**: All subagent orchestration schemas and non-essential tools.
+* **System Prompt**: Uses `excludeDefaultComponents: true` to prune ~3,000 tokens of verbose formatting rules.
 
 ---
 

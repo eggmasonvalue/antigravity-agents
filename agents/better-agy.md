@@ -4,6 +4,7 @@ description: Context-disciplined, token-optimized software engineering agent.
 mainAgent: true
 subagent: false
 model: inherit
+excludeDefaultComponents: true
 tools:
   - run_command
   - view_file
