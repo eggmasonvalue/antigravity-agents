@@ -1,12 +1,12 @@
-# Antigravity CLI Turn-0 Context Specification (`v1.5.13`)
+# Antigravity CLI Turn-0 Context Specification (`v1.5.14`)
 
-This document provides the **verbatim Turn-0 context** injected by the Google Antigravity runtime on session startup for `agy v1.5.13`, along with the exact subset mapping for **`clean`**, **`bare`**, and `clean`'s private **`worker`**.
+This document provides the **verbatim Turn-0 context** injected by the Google Antigravity runtime on session startup for `agy v1.5.14`, along with the exact subset mapping for **`clean`**, **`bare`**, and `clean`'s private **`worker`**.
 
 Interactive visualizer: [Live Web App](https://eggmasonvalue.github.io/antigravity-agents/) ([`docs/index.html`](index.html))
 
 ---
 
-## 1. Token Accounting Summary (`agy v1.5.13`)
+## 1. Token Accounting Summary (`agy v1.5.14`)
 
 Measured with `Gemini 4 Neon (XHigh)` using `agy --output-format json -p "Output 'PONG' and nothing else"`:
 
@@ -53,7 +53,7 @@ Measured with `Gemini 4 Neon (XHigh)` using `agy --output-format json -p "Output
 
 ---
 
-## 3. Verbatim Tool Declarations (`agy v1.5.13`)
+## 3. Verbatim Tool Declarations (`agy v1.5.14`)
 
 ### Tier 1: Core Tools (6 Tools &bull; In `bare`, `clean`, Default)
 
@@ -352,7 +352,7 @@ Measured with `Gemini 4 Neon (XHigh)` using `agy --output-format json -p "Output
 
 ---
 
-## 4. Verbatim System Instructions (`agy v1.5.13`)
+## 4. Verbatim System Instructions (`agy v1.5.14`)
 
 ### `<user_information>` (In Default & `clean` &bull; Pruned in `bare`)
 ```xml

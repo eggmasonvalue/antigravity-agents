@@ -11,7 +11,7 @@ This repository provides two purpose-built, context-disciplined custom agents—
 
 ---
 
-### Turn-0 Benchmark (`agy v1.5.13`)
+### Turn-0 Benchmark (`agy v1.5.14`)
 
 ```bash
 # Verify programmatically on your own machine:
@@ -42,7 +42,7 @@ Turn-0 savings only matter if you don't immediately burn them on Turn 2. Both pr
 
 ## 🔍 Verbatim Turn-0 Context, Decisions & Subsets
 
-Both custom agents are strict functional subsets of the `agy v1.5.13` runtime context:
+Both custom agents are strict functional subsets of the `agy v1.5.14` runtime context:
 
 - 📄 **[Turn-0 Context Specification](docs/turn-zero-context.md)**: Verbatim dump and token accounting for all 14 tool parameter schemas and 11 system prompt XML blocks.
 - 🧭 **[Philosophy & Decision Records](docs/decisions.md)**: Upgrade evaluation rubric and architectural decision log (`DR-001`–`DR-006`) with revisit triggers.

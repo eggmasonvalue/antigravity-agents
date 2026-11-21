@@ -14,7 +14,7 @@ Target `--agent bare` for self-contained subtasks (~2k Turn-0 tokens) or `--agen
 
 ---
 
-## 1. CLI Capability & Parameter Matrix (`agy v1.5.13`)
+## 1. CLI Capability & Parameter Matrix (`agy v1.5.14`)
 
 ### Invocation & Session State
 - `-p, --print "<prompt>"`: Run a single prompt non-interactively to completion.
