@@ -14,12 +14,12 @@ Target `--agent bare` for self-contained subtasks (~2k Turn-0 tokens) or `--agen
 
 ---
 
-## 1. CLI Capability & Parameter Matrix (`agy v1.5.14`)
+## 1. CLI Capability & Parameter Matrix (`agy v1.5.17`)
 
 ### Invocation & Session State
 - `-p, --print "<prompt>"`: Run a single prompt non-interactively to completion.
 - `--agent <name>`: Target agent persona (`bare` for ultra-lean leaf workers; `clean` for rules/skills-aware workers).
-- `--conversation <id>`: Continue an existing session by `conversation_id`, retaining accumulated context.
+- `-r, --resume, --conversation <id>`: Continue an existing session by `conversation_id`, retaining accumulated context.
 - `-c, --continue`: Continue the most recent session.
 
 ### Output, Streaming & Observability
@@ -53,10 +53,10 @@ agy --agent bare --mode plan --effort low --output-format json \
 ```
 
 ### Background Asynchronous Worker
-Launch with `WaitMsBeforeAsync: 500` in `run_command` for long builds or multi-step runs; `run_command` backgrounds the process and wakes you automatically on completion (never poll `manage_task`).
+Launch with `WaitMsBeforeAsync: 500` (and optionally `NotificationTimeoutSeconds` for a stalled-run check-in) in `run_command` for long builds or multi-step runs; `run_command` backgrounds the process and wakes you automatically on completion (never poll `manage_task`).
 
 ### Multi-Turn Steerable Continuation
-Capture `conversation_id` from the initial `--output-format json` response and pass `--conversation <id>` on follow-up turns, or hold one warm process open with `--input-format stream-json --output-format stream-json`.
+Capture `conversation_id` from the initial `--output-format json` response and pass `-r <id>` / `--conversation <id>` on follow-up turns, or hold one warm process open with `--input-format stream-json --output-format stream-json`.
 
 ### Isolated Git Worktree Worker
 ```bash

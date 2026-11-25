@@ -1,8 +1,8 @@
 # Antigravity Agents
 
-> **Cut Turn-0 overhead by up to ~77% and keep multi-turn context lean with a zero-overlap, workflow-first Antigravity harness.**
+> **Cut Turn-0 overhead by up to ~78% and keep multi-turn context lean with a zero-overlap, workflow-first Antigravity harness.**
 
-Modern frontier models don't need walls of prescriptive boilerplate or overlapping delegation tools—they need clean context windows and sharp, non-overlapping primitives. Every default Google Antigravity session injects **~8,700 input tokens** of built-in tool schemas (including 5 overlapping orchestration tools), built-in skill manifests, and redundant prompt sections before your first message—and unconstrained shell output can compound that cost rapidly over a multi-turn session.
+Modern frontier models don't need walls of prescriptive boilerplate or overlapping delegation tools—they need clean context windows and sharp, non-overlapping primitives. Every default Google Antigravity session injects **~9,600 input tokens** of built-in tool schemas (including 5 overlapping orchestration tools and UI widgets), built-in skill manifests, and redundant prompt sections before your first message—and unconstrained shell output can compound that cost rapidly over a multi-turn session.
 
 This repository provides two purpose-built, context-disciplined custom agents—**`clean`** and **`bare`**—retaining all native Google Antigravity OAuth subscription benefits:
 
@@ -11,7 +11,7 @@ This repository provides two purpose-built, context-disciplined custom agents—
 
 ---
 
-### Turn-0 Benchmark (`agy v1.5.14`)
+### Turn-0 Benchmark (`agy v1.5.17`)
 
 ```bash
 # Verify programmatically on your own machine:
@@ -22,9 +22,9 @@ agy --agent bare  --output-format json -p "Output 'PONG' and nothing else"
 
 | Agent Configuration | Turn-0 Base Tokens | Context Tax Reduction | Architecture & Role |
 | :--- | :---: | :---: | :--- |
-| **Default Antigravity Agent** | `8,676` tokens | Baseline | 14 built-in tools + 11 XML prompt sections + built-in skills & subagents |
-| **`clean`** | **`4,401` tokens** | **-4,275 tokens (~49.3% cut)** | 7 non-overlapping tools (6 core + `run_workflow`); full rules/skills/MCP; privately scoped `worker`, `run-workflow`, & `agy-subagents` |
-| **`bare`** | **`2,019` tokens** | **-6,657 tokens (~76.7% cut)** | 6 leaf tools; `excludeDefaultComponents: true` + `inheritMcp: false`; zero boilerplate for headless/CI/workers/solo runway |
+| **Default Antigravity Agent** | `9,620` tokens | Baseline | 15 built-in tools + 11 XML prompt sections + built-in skills & subagents |
+| **`clean`** | **`4,621` tokens** | **-4,999 tokens (~52.0% cut)** | 7 non-overlapping tools (6 core + `run_workflow`); full rules/skills/MCP; privately scoped `worker`, `run-workflow`, & `agy-subagents` |
+| **`bare`** | **`2,134` tokens** | **-7,486 tokens (~77.8% cut)** | 6 leaf tools; `excludeDefaultComponents: true` + `inheritMcp: false`; zero boilerplate for headless/CI/workers/solo runway |
 
 *(Run `/context` inside any interactive session to inspect your live breakdown.)*
 
@@ -36,16 +36,16 @@ Turn-0 savings only matter if you don't immediately burn them on Turn 2. Both pr
 
 - **Bounding `run_command` and chat dumps (`Context Discipline`)**: Every tool output and reply stays in history and is re-processed on every subsequent turn. `run_command` executes unpaged (`PAGER=cat`) and truncates past ~10 KB (~2.5k–3k tokens), dropping the middle of the output and saving the full stream to disk. Preferring bounded or quiet commands (`git log -n`, `rg -l`, summary flags—without hiding errors or breaking exit codes) and avoiding pasting code blocks or raw diffs of edits already written to disk prevents redundant output from wiping out Turn-0 gains.
 - **Fewer round-trips (`Execution Efficiency`)**: Batching independent reads/edits in parallel and chaining shell commands reduces how many times the growing conversation history is re-sent.
-- **Compounding fan-out savings (`run_workflow` + bare `worker`)**: Every child agent spawned by `clean`'s `run_workflow` runs on the bare `worker` (~2k Turn-0 tokens) instead of the ~8.7k-token default agent—saving ~6.6k tokens per child (~130k+ tokens in a 20-worker fan-out) while keeping intermediate traces out of the parent context.
+- **Compounding fan-out savings (`run_workflow` + bare `worker`)**: Every child agent spawned by `clean`'s `run_workflow` runs on the bare `worker` (~2.1k Turn-0 tokens) instead of the ~9.6k-token default agent—saving ~7.5k tokens per child (~150k+ tokens in a 20-worker fan-out) while keeping intermediate traces out of the parent context.
 
 ---
 
 ## 🔍 Verbatim Turn-0 Context, Decisions & Subsets
 
-Both custom agents are strict functional subsets of the `agy v1.5.14` runtime context:
+Both custom agents are strict functional subsets of the `agy v1.5.17` runtime context:
 
-- 📄 **[Turn-0 Context Specification](docs/turn-zero-context.md)**: Verbatim dump and token accounting for all 14 tool parameter schemas and 11 system prompt XML blocks.
-- 🧭 **[Philosophy & Decision Records](docs/decisions.md)**: Upgrade evaluation rubric and architectural decision log (`DR-001`–`DR-006`) with revisit triggers.
+- 📄 **[Turn-0 Context Specification](docs/turn-zero-context.md)**: Verbatim dump and token accounting for all 15 tool parameter schemas and 11 system prompt XML blocks.
+- 🧭 **[Philosophy & Decision Records](docs/decisions.md)**: Upgrade evaluation rubric and architectural decision log (`DR-001`–`DR-007`) with revisit triggers.
 - 🎨 **[Interactive Turn-0 Overlay](https://eggmasonvalue.github.io/antigravity-agents/)** ([`docs/index.html`](docs/index.html)): Interactive visualizer with segmented toggles to compare verbatim Turn-0 context across `Default`, `clean`, and `bare`.
 
 ---
@@ -72,10 +72,10 @@ irm https://raw.githubusercontent.com/eggmasonvalue/antigravity-agents/main/scri
 A full Antigravity citizen that drops built-in noise and overlapping delegation tools while retaining workspace rules (`AGENTS.md`/`GEMINI.md`), user/workspace skills, and MCP servers.
 
 - **Tools Kept (7)**: `read_file`, `edit_file`, `write_file`, `run_command`, `manage_task`, `search_web`, `run_workflow`.
-- **Pruned (7)**: `invoke_subagent`, `define_subagent`, `send_message`, `manage_subagents`, `swarm`, `schedule`, `ask_question`.
-- **Prompt & Skills Trimmed**: Automatically drops `<identity>`, `<conversation_transcript>`, `<work_efficiently>`, `<slash_commands>`, `<subagents>`, and all built-in skills (`agy-customizations`, `antigravity-guide`, `run-workflow`, `swarm_monitor`, `swarm_pane`).
+- **Pruned (8)**: `invoke_subagent`, `define_subagent`, `send_message`, `manage_subagents`, `swarm`, `schedule`, `ask_question`, `update_steps`.
+- **Prompt & Skills Trimmed**: Automatically drops `<identity>`, `<conversation_transcript>`, `<work_efficiently>`, `<slash_commands>`, `<subagents>`, and all built-in skills (`agy-customizations`, `antigravity-guide`, `conversations`, `run-workflow`, `swarm_monitor`, `swarm_pane`).
 - **Privately Scoped Bundle** (`~/.gemini/config/agents/clean/`):
-  - **`worker.md`** (`mainAgent: false`, `subagent: true`, `excludeDefaultComponents: true`, `inheritMcp: false`): A bare-metal leaf worker (~2k tokens/child) invoked via `run_workflow(..., type_name="worker")`. In a 20-agent parallel fan-out, this saves ~130,000+ input tokens compared to the default agent's `type_name="self"`.
+  - **`worker.md`** (`mainAgent: false`, `subagent: true`, `excludeDefaultComponents: true`, `inheritMcp: false`): A bare-metal leaf worker (~2.1k tokens/child) invoked via `run_workflow(..., type_name="worker")`. In a 20-agent parallel fan-out, this saves ~150,000+ input tokens compared to the default agent's `type_name="self"`.
   - **`skills/run-workflow/SKILL.md`**: Concise workflow primitive guide instructing `clean` to target `type_name="worker"` and brief workers explicitly with paths and relevant repo rules.
   - **`skills/agy-subagents/SKILL.md`**: On-demand CLI orchestration skill for steerable `--conversation` / `--input-format stream-json` runs or explicit `--model`/`--effort`/`--sandbox` flags (targeting `--agent bare`).
 

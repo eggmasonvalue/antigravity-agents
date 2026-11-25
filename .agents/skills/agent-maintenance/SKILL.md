@@ -42,7 +42,7 @@ The **active session's context window (the tool declarations block)** is the sol
 
 - **`agents/clean/agent.md` (Daily Driver + Programmable Workflows — 7 Tools)**:
   - Verify it includes the 6 core tools (`read_file`, `edit_file`, `write_file`, `run_command`, `manage_task`, `search_web`) + `run_workflow`.
-  - Ensure overlapping/UI-only tools (`invoke_subagent`, `define_subagent`, `send_message`, `manage_subagents`, `ask_question`, `schedule`, `swarm`) remain excluded.
+  - Ensure overlapping/UI-only tools (`invoke_subagent`, `define_subagent`, `send_message`, `manage_subagents`, `ask_question`, `schedule`, `swarm`, `update_steps`) remain excluded.
   - Ensure `excludeDefaultComponents` is **not** set (so `<user_information>`, `AGENTS.md`/`GEMINI.md` rules, `<skills>`, and MCP remain active).
   - Verify private bundle declarations: `agents: [worker.md]` and `skills: [skills/run-workflow, skills/agy-subagents]`.
   - Verify `mainAgent: true` and `subagent: false`.

@@ -8,7 +8,7 @@ disable-slash-command: true
 
 # Dynamic Workflows (`run_workflow`)
 
-A workflow is a Python script executed by `run_workflow` (using Python bundled with `agy`). Use it whenever orchestration is code: parallel fan-out across files/modules/checks, sequential pipelines, multi-turn review-and-fix loops, or structured aggregation.
+A workflow is a Python script executed by `run_workflow` (in its own `python3` process). Use it whenever orchestration is code: parallel fan-out across files/modules/checks, sequential pipelines, multi-turn review-and-fix loops, or structured aggregation.
 
 ## Critical Rules for `clean`
 
