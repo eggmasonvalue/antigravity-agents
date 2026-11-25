@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Antigravity CLI v1.5.14 — Verbatim Turn-0 Context &amp; Subsets</title>
+  <title>Antigravity CLI v1.5.17 — Verbatim Turn-0 Context &amp; Subsets</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -297,15 +297,15 @@
   <header class="top-bar">
     <div class="top-container">
       <div class="title-block">
-        <h1>ANTIGRAVITY v1.5.14 &mdash; VERBATIM TURN-0 CONTEXT SPECIFICATION</h1>
+        <h1>ANTIGRAVITY v1.5.17 &mdash; VERBATIM TURN-0 CONTEXT SPECIFICATION</h1>
         <p>Raw prompt text &amp; parameter schemas with custom agent subset overlays</p>
       </div>
 
       <div class="controls-row">
         <div class="overlay-controls">
-          <button class="overlay-btn active" data-mode="all" onclick="setOverlay('all')">Default (8,676)</button>
-          <button class="overlay-btn" data-mode="clean" onclick="setOverlay('clean')">clean (4,401)</button>
-          <button class="overlay-btn" data-mode="bare" onclick="setOverlay('bare')">bare (2,019)</button>
+          <button class="overlay-btn active" data-mode="all" onclick="setOverlay('all')">Default (9,620)</button>
+          <button class="overlay-btn" data-mode="clean" onclick="setOverlay('clean')">clean (4,621)</button>
+          <button class="overlay-btn" data-mode="bare" onclick="setOverlay('bare')">bare (2,134)</button>
         </div>
 
         <button class="toggle-all-btn" onclick="toggleAllSections(true)">Expand All</button>
@@ -313,7 +313,7 @@
       </div>
 
       <div class="token-ticker">
-        Active Tokens: <span class="token-val" id="token-count">8,676</span>
+        Active Tokens: <span class="token-val" id="token-count">9,620</span>
         <span id="reduction-pct" style="color: var(--text-muted); margin-left: 6px;">(Baseline)</span>
       </div>
     </div>
@@ -328,7 +328,7 @@
           <span class="chevron-icon">&#9658;</span>
           <span>Part 1: Tool Declarations</span>
         </div>
-        <span class="part-count">14 Built-in Tools</span>
+        <span class="part-count">15 Built-in Tools</span>
       </summary>
 
       <div class="part-content">
@@ -432,12 +432,13 @@
           </summary>
           <pre class="code-view">{
   "name": "run_command",
-  "description": "Execute a command in the workspace. Operating System: linux. Shell: bash. Each command runs in a new session (working directory changes and environment variables do not persist across calls). Commands that do not finish within the specified wait time continue running in the background as tasks; the system will notify you when they finish, so do not poll their status or set timers to check on them.",
+  "description": "Execute a command in the workspace. Operating System: linux. Shell: bash. Each command runs in a new session (working directory changes and environment variables do not persist across calls). Commands that do not finish within the specified wait time continue running in the background as tasks; the system will notify you when they finish, so do not poll their status or set timers to check on them. Instead, set NotificationTimeoutSeconds to be notified if a command is still running after that long.",
   "parameters": {
     "type": "OBJECT",
     "properties": {
       "CommandLine": { "type": "STRING", "description": "The exact command line string to execute." },
       "WaitMsBeforeAsync": { "type": "INTEGER", "description": "Milliseconds to wait for the command to finish before backgrounding it (500 to 10000)." },
+      "NotificationTimeoutSeconds": { "type": "INTEGER", "description": "Optional wakeup duration (in seconds) after WaitMsBeforeAsync if the command is still running." },
       "IsDaemon": { "type": "BOOLEAN", "description": "Set to true for long-running support processes (dev servers, file watchers, tunnels)." },
       "toolSummary": { "type": "STRING", "description": "Brief 2-5 word noun phrase describing the command task." }
     },
@@ -517,7 +518,7 @@
 }</pre>
         </details>
 
-        <!-- Pruned 7 Tools (default only) -->
+        <!-- Pruned 8 Tools (default only) -->
         <details class="context-block" data-tiers="default">
           <summary class="block-header">
             <div class="block-title-group">
@@ -701,6 +702,38 @@
   }
 }</pre>
         </details>
+
+        <details class="context-block" data-tiers="default">
+          <summary class="block-header">
+            <div class="block-title-group">
+              <span class="chevron-icon">&#9658;</span>
+              <span class="block-title">tool: update_steps</span>
+              <span class="status-indicator"></span>
+            </div>
+          </summary>
+          <pre class="code-view">{
+  "name": "update_steps",
+  "description": "Shows the user a live checklist of the steps you are carrying out (3 to 12 steps, replaced on each call, with per-step narration and final all-done call).",
+  "parameters": {
+    "type": "OBJECT",
+    "properties": {
+      "steps": {
+        "type": "ARRAY",
+        "description": "The full ordered list of steps (at most 12). Replaces any previous list.",
+        "items": {
+          "type": "OBJECT",
+          "properties": {
+            "status": { "type": "STRING", "enum": ["pending", "in_progress", "done", "skipped", "failed"] },
+            "title": { "type": "STRING", "description": "Short imperative title of the step (2-6 words)." }
+          },
+          "required": ["title", "status"]
+        }
+      }
+    },
+    "required": ["steps"]
+  }
+}</pre>
+        </details>
       </div>
     </details>
 
@@ -746,10 +779,10 @@ Artifact Directory Path: /home/.../.gemini/antigravity-cli/brain/&lt;uuid&gt;
 If a skill seems relevant to your current task, you MUST read its `SKILL.md` instructions before proceeding.
 
 Default skills:
-- agent-maintenance, agy-customizations, antigravity-guide, run-workflow, swarm_monitor, swarm_pane
+- agent-maintenance, agy-customizations, antigravity-guide, conversations, run-workflow, swarm_monitor, swarm_pane (+ ~/.agents/skills)
 
 clean skills (built-ins stripped; private scoped bundle mounted):
-- agent-maintenance (workspace)
+- agent-maintenance (workspace) (+ ~/.agents/skills)
 - run-workflow (~/.gemini/config/agents/clean/skills/run-workflow/SKILL.md)
 - agy-subagents (~/.gemini/config/agents/clean/skills/agy-subagents/SKILL.md)
 &lt;/skills&gt;</pre>
@@ -921,7 +954,7 @@ Available subagents:
   </main>
 
   <footer>
-    Antigravity Agents &bull; Verbatim Turn-0 Context (agy v1.5.14) &bull; <a href="https://github.com/eggmasonvalue/antigravity-agents" style="color: var(--text-bright);">GitHub Repository</a>
+    Antigravity Agents &bull; Verbatim Turn-0 Context (agy v1.5.17) &bull; <a href="https://github.com/eggmasonvalue/antigravity-agents" style="color: var(--text-bright);">GitHub Repository</a>
   </footer>
 
   <script>
@@ -934,16 +967,16 @@ Available subagents:
       const redEl = document.getElementById('reduction-pct');
 
       if (mode === 'all') {
-        tokenEl.textContent = '8,676';
+        tokenEl.textContent = '9,620';
         redEl.textContent = '(Baseline)';
         redEl.style.color = 'var(--text-muted)';
       } else if (mode === 'clean') {
-        tokenEl.textContent = '4,401';
-        redEl.textContent = '(-49.3% cut)';
+        tokenEl.textContent = '4,621';
+        redEl.textContent = '(-52.0% cut)';
         redEl.style.color = 'var(--accent-blue)';
       } else if (mode === 'bare') {
-        tokenEl.textContent = '2,019';
-        redEl.textContent = '(-76.7% cut)';
+        tokenEl.textContent = '2,134';
+        redEl.textContent = '(-77.8% cut)';
         redEl.style.color = 'var(--accent-green)';
       }
 

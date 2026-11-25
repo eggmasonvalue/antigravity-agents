@@ -1,20 +1,22 @@
-# Antigravity CLI Turn-0 Context Specification (`v1.5.14`)
+# Antigravity CLI Turn-0 Context Specification (`v1.5.17`)
 
-This document provides the **verbatim Turn-0 context** injected by the Google Antigravity runtime on session startup for `agy v1.5.14`, along with the exact subset mapping for **`clean`**, **`bare`**, and `clean`'s private **`worker`**.
+This document provides the **verbatim Turn-0 context** injected by the Google Antigravity runtime on session startup for `agy v1.5.17`, along with the exact subset mapping for **`clean`**, **`bare`**, and `clean`'s private **`worker`**.
 
 Interactive visualizer: [Live Web App](https://eggmasonvalue.github.io/antigravity-agents/) ([`docs/index.html`](index.html))
 
 ---
 
-## 1. Token Accounting Summary (`agy v1.5.14`)
+## 1. Token Accounting Summary (`agy v1.5.17`)
 
-Measured with `Gemini 4 Neon (XHigh)` using `agy --output-format json -p "Output 'PONG' and nothing else"`:
+Measured with `Gemini 4 Neon (Medium)` using `agy --output-format json -p "Output 'PONG' and nothing else"`:
 
 | Profile | Base Tokens | Delta vs Default | Tools Declared | System Prompt & Customizations |
 | :--- | :---: | :---: | :---: | :--- |
-| **Default Agent** | `8,676` | Baseline | 14 tools | All 11 built-in XML blocks + built-in skills & subagents |
-| **`clean`** | `4,401` | `-4,275` (`-49.3%`) | 7 tools | 6 core XML blocks (`<user_information>`, `<skills>`, `<messaging>`, `<artifacts>`, `<guidelines>`, `<communication_style>`, plus `<user_rules>` when present) + `# Principles` + privately scoped `worker`, `run-workflow`, `agy-subagents` |
-| **`bare`** | `2,019` | `-6,657` (`-76.7%`) | 6 tools | Custom `# Principles` only (`excludeDefaultComponents: true`, `inheritMcp: false`) |
+| **Default Agent** | `9,620` | Baseline | 15 tools | All 11 built-in XML blocks + 6 built-in skills + workspace/user skills & subagents |
+| **`clean`** | `4,621` | `-4,999` (`-52.0%`) | 7 tools | 6 core XML blocks (`<user_information>`, `<skills>`, `<messaging>`, `<artifacts>`, `<guidelines>`, `<communication_style>`, plus `<user_rules>` when present) + `# Principles` + privately scoped `worker`, `run-workflow`, `agy-subagents` (plus workspace & user-global skills) |
+| **`bare`** | `2,134` | `-7,486` (`-77.8%`) | 6 tools | Custom `# Principles` only (`excludeDefaultComponents: true`, `inheritMcp: false`) |
+
+*(Note: `agy v1.5.16+` also discovers cross-tool user-global skills in `~/.agents/skills/`; machine-local user skills contribute identically to Default and `clean`, and are stripped in `bare` and `worker`.)*
 
 ---
 
@@ -36,6 +38,7 @@ Measured with `Gemini 4 Neon (XHigh)` using `agy --output-format json -p "Output
 | `swarm` | Tool | ✅ | ❌ | ❌ | Pruned (Quota-heavy preview; not exposed to custom agents) |
 | `schedule` | Tool | ✅ | ❌ | ❌ | Pruned (Handled via shell / explicit `/schedule` when needed) |
 | `ask_question` | Tool | ✅ | ❌ | ❌ | Pruned (Handled via plain chat) |
+| `update_steps` | Tool | ✅ | ❌ | ❌ | Pruned (UI-only live step checklist widget; ~620 Turn-0 tokens + extra narration turns — see `DR-007`) |
 | `<user_information>` | Prompt | ✅ | ✅ | ❌ | Kept in `clean`; pruned in `bare` (`pwd` path grounding in `# Principles`) |
 | `<skills>` | Prompt | ✅ | ✅* | ❌ | *`clean` drops all built-in skills and mounts only private `run-workflow` + `agy-subagents` plus workspace/user skills; pruned in `bare` |
 | `<messaging>` | Prompt | ✅ | ✅ | ❌ | Kept in `clean`; replaced by 1-line async rule in `bare` |
@@ -53,7 +56,7 @@ Measured with `Gemini 4 Neon (XHigh)` using `agy --output-format json -p "Output
 
 ---
 
-## 3. Verbatim Tool Declarations (`agy v1.5.14`)
+## 3. Verbatim Tool Declarations (`agy v1.5.17`)
 
 ### Tier 1: Core Tools (6 Tools &bull; In `bare`, `clean`, Default)
 
@@ -134,12 +137,13 @@ Measured with `Gemini 4 Neon (XHigh)` using `agy --output-format json -p "Output
 ```json
 {
   "name": "run_command",
-  "description": "Execute a command in the workspace. Operating System: linux. Shell: bash. Each command runs in a new session (working directory changes and environment variables do not persist across calls). Commands that do not finish within the specified wait time continue running in the background as tasks; the system will notify you when they finish, so do not poll their status or set timers to check on them.",
+  "description": "Execute a command in the workspace. Operating System: linux. Shell: bash. Each command runs in a new session (working directory changes and environment variables do not persist across calls). Commands that do not finish within the specified wait time continue running in the background as tasks; the system will notify you when they finish, so do not poll their status or set timers to check on them. Instead, set NotificationTimeoutSeconds to be notified if a command is still running after that long.",
   "parameters": {
     "type": "OBJECT",
     "properties": {
       "CommandLine": { "type": "STRING", "description": "The exact command line string to execute." },
       "WaitMsBeforeAsync": { "type": "INTEGER", "description": "Milliseconds to wait for the command to finish before backgrounding it (500 to 10000). Set to a larger value (e.g. 5000-10000) for commands expected to finish synchronously; set to 500 for commands intended to run in the background." },
+      "NotificationTimeoutSeconds": { "type": "INTEGER", "description": "Optional. If the command runs for longer than this duration (in seconds) after the wait time (WaitMsBeforeAsync), the system will notify you that it is still running. Use this instead of setting a manual timer for checking status of commands. Highly recommended if the command is expected to terminate at all. Do not set this for daemon commands, which are expected to run indefinitely." },
       "IsDaemon": { "type": "BOOLEAN", "description": "Set to true for long-running support processes that are meant to keep running in the background indefinitely and are not expected to finish on their own (e.g., dev servers, file watchers, tunnels). Leave false (the default) for normal commands that are expected to terminate." },
       "toolSummary": { "type": "STRING", "description": "Brief 2-5 word noun phrase describing the command task. Capitalize like a sentence. Some examples: 'Git status check', 'Unit test execution', 'Package build', 'Dev server startup'." }
     },
@@ -206,7 +210,7 @@ Measured with `Gemini 4 Neon (XHigh)` using `agy --output-format json -p "Output
 
 ---
 
-### Tier 3: Pruned Built-in Tools (7 Tools &bull; Default Only)
+### Tier 3: Pruned Built-in Tools (8 Tools &bull; Default Only)
 
 #### `invoke_subagent`
 ```json
@@ -350,9 +354,42 @@ Measured with `Gemini 4 Neon (XHigh)` using `agy --output-format json -p "Output
 }
 ```
 
+#### `update_steps`
+```json
+{
+  "name": "update_steps",
+  "description": "Shows the user a live checklist of the steps you are carrying out.\n\nWhen to use:\n- Call it once you have committed to an ordered list of 3 to 12 distinct steps for the current request, whatever their source: an approved plan, a list the user gave you, a skill's procedure, or steps you worked out yourself.\n- Skip it for requests that take 1-2 steps, pure questions, and open-ended exploration where you cannot name the steps yet. Never invent steps just to fill the list.\n\nHow to use:\n- Always send the full list. Each call replaces the previous one, so to re-plan, send the new list. Keep steps in the order you do them: when you split or add a step, put it where it happens, not at the end.\n- Mark the step you are working on \"in_progress\"; the rest are \"pending\", \"done\", \"skipped\" or \"failed\". When you work on several steps at once (for example, parallel subagents), mark each of them \"in_progress\".\n- Call it in parallel with the first tool call of a step, so it adds no extra turn: once at the start (first step in_progress), then each time you move on (mark the finished step done and the next one in_progress in the same call).\n- When the last step is finished, call it once more with every step done before writing your final reply.\n- Each time you mark a step done, tell the user in one or two sentences what you did and what comes next, in your message alongside that call.\n\nTitles:\n- Short and imperative (2-6 words), in plain words the user would use, e.g. \"Merge branch into main\".\n- No numbers, IDs or labels from your plan (\"0.1\", \"Step 2:\", \"P0\"), and no code identifiers unless the user named them.\n- Aim for 3 to 8 steps; group small tasks into one step rather than listing each.",
+  "parameters": {
+    "type": "OBJECT",
+    "properties": {
+      "steps": {
+        "type": "ARRAY",
+        "description": "The full ordered list of steps (at most 12). Replaces any previous list.",
+        "items": {
+          "type": "OBJECT",
+          "properties": {
+            "status": {
+              "type": "STRING",
+              "description": "Current status of the step.",
+              "enum": ["pending", "in_progress", "done", "skipped", "failed"]
+            },
+            "title": {
+              "type": "STRING",
+              "description": "Short imperative title of the step (2-6 words), e.g. 'Merge branch into main'."
+            }
+          },
+          "required": ["title", "status"]
+        }
+      }
+    },
+    "required": ["steps"]
+  }
+}
+```
+
 ---
 
-## 4. Verbatim System Instructions (`agy v1.5.14`)
+## 4. Verbatim System Instructions (`agy v1.5.17`)
 
 ### `<user_information>` (In Default & `clean` &bull; Pruned in `bare`)
 ```xml
@@ -379,14 +416,17 @@ Available skills (Default):
 - agent-maintenance (.../SKILL.md)
 - agy-customizations (.../builtin/skills/agy-customizations/SKILL.md)
 - antigravity-guide (.../builtin/skills/antigravity_guide/SKILL.md)
+- conversations (.../builtin/skills/conversations/SKILL.md)
 - run-workflow (.../builtin/skills/run-workflow/SKILL.md)
 - swarm_monitor (.../builtin/skills/swarm_monitor/SKILL.md)
 - swarm_pane (.../builtin/skills/swarm_pane/SKILL.md)
+  (+ any user-global skills in ~/.gemini/config/skills/ or ~/.agents/skills/)
 
 Available skills (clean):
 - agent-maintenance (.../SKILL.md)                  # workspace skill
 - run-workflow (.../agents/clean/skills/run-workflow/SKILL.md)    # private to clean
 - agy-subagents (.../agents/clean/skills/agy-subagents/SKILL.md)  # private to clean
+  (+ any user-global skills in ~/.gemini/config/skills/ or ~/.agents/skills/)
 </skills>
 ```
 

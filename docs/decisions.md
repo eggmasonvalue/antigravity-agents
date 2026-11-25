@@ -56,3 +56,8 @@ Apply these five checks whenever auditing a new `agy` release:
 - **Decision**: Focus `Context Discipline` on `run_command`'s unpaged ~10 KB middle-dropping output (`PAGER=cat`) using safe native bounds (`git log -n`, `rg -l`, summary flags) without hiding errors or breaking exit codes, plus avoiding pasting code blocks/raw diffs/file recaps already written to disk—with **no** directive restricting conversational tone or micromanaging `read_file` (which already enforces its own 800-line / 46 KB cap).
 - **Why**: Tool outputs and echoed code blocks persist in conversation history and compound across every subsequent turn, whereas prescribing `| head`/`| tail` or aggressive `read_file` slicing risks `SIGPIPE`, masked exit codes, and extra round-trips. Conversational style with a human belongs to the model and project context, not the harness.
 - **Revisit if**: `run_command` gains tighter context-friendly defaults that eliminate middle-truncation surprises and ~10 KB history churn.
+
+### DR-007: Prune `update_steps` UI Checklist Tool (`agy v1.5.17`)
+- **Decision**: Exclude `update_steps` (added in `agy v1.5.16`) from `clean`, `bare`, and `worker`.
+- **Why**: `update_steps` is a UI-only live step checklist widget rendered above the CLI prompt. Its verbose schema costs ~620 Turn-0 tokens and instructs the model to emit extra step-transition tool calls (including a trailing all-done call before the final reply) alongside mandatory per-step progress narration—violating both the zero-overlap / UI-widget filter and anti-micromanagement principles.
+- **Revisit if**: `update_steps` becomes required for durable checkpoint/resume semantics or sheds its Turn-0 schema bloat and mandatory narration turns.
